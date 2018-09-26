@@ -6,13 +6,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Time Tracker</title>
+
+    <!-- vendor styles -->
+
+    <!-- my styles -->
+    <link rel="stylesheet" href="styles/main.css">
+
+    <!-- vendors scripts -->
+    <script src="vendors/angular.js"></script>
+    <script src="vendors/angular-route.js"></script>
+
+    <!-- my scripts -->
+    <script src="scripts/client.js"></script>
+
 </head>
 
-<body>
+<body ng-app="TimeTrackerApp" ng-controller="MainController as vm">
 
     <h1>Time Tracker</h1>
 
-    <form ng-submit="addTimeEntry(newTimeEntry)">
+    <form ng-submit="vm.addTimeEntry(vm.newTimeEntry)">
         <h3>Add Time Entry</h3>
         <!-- as simple as possible right now, we'll style once we add Material -->
         <input type="text" ng-model="vm.newTimeEntry.description" placeholder="what did you do?" />
@@ -21,6 +34,8 @@
         <input type="text" ng-model="vm.newTimeEntry.endTime" placeholder="end time" />
         <input type="submit" />
     </form>
+
+    <pre>{{vm | json}}</pre>
 
 </body>
 
