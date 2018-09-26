@@ -1,0 +1,26 @@
+{
+  "name": "00-angular-time-tracker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server/server.js",
+    "develop": "nodemon server/server.js --ignore server/public/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/josephcarey/angular-time-tracker.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/josephcarey/angular-time-tracker/issues"
+  },
+  "homepage": "https://github.com/josephcarey/angular-time-tracker#readme",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3",
+    "pg": "^7.4.3"
+  }
+}
