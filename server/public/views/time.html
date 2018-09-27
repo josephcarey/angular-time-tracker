@@ -1,0 +1,39 @@
+<h1>TIME VIEW</h1>
+
+<form ng-submit="vm.addTimeEntry(vm.newTimeEntry)">
+    <h3>Add Time Entry</h3>
+    <!-- as simple as possible right now, we'll style once we add Material -->
+    <input type="text" ng-model="vm.newTimeEntry.description" placeholder="what did you do?" />
+    <input type="text" ng-model="vm.newTimeEntry.date" placeholder="date" />
+    <input type="text" ng-model="vm.newTimeEntry.startTime" placeholder="start time" />
+    <input type="text" ng-model="vm.newTimeEntry.endTime" placeholder="end time" />
+    <input type="submit" />
+</form>
+
+<table>
+    <thead>
+        <tr>
+            <th>Description</th>
+            <th>Date</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="time in vm.displayTimeEntries">
+            <td>{{time.description}}</td>
+            <td>{{time.date | date : "dd MMM yyyy"}}</td>
+            <td>{{time.start_time}}</td>
+            <td>{{time.end_time}}</td>
+            <td>
+                <button ng-click="vm.deleteTimeEntry(time)">Delete</button>
+            </td>
+        </tr>
+    </tbody>
+    <tfoot>
+
+    </tfoot>
+</table>
+
+<pre>{{vm | json}}</pre>
