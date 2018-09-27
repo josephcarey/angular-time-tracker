@@ -51,4 +51,29 @@ router.post( '/', ( req, res ) => {
 
 } )
 
+// Read -- GET
+router.get( '/', ( req, res ) => {
+
+    console.log( '###', routerName, 'router /GET call.' );
+
+    pool.query(
+        `SELECT * FROM "time_entry";`
+    )
+        .then( ( results ) => {
+
+            console.log( '### Back from DB with:' );
+            console.log( results.rows );
+            res.send( results.rows );
+
+        } )
+        .catch( ( error ) => {
+
+            console.log( '### Error with SQL SELECT:' );
+            console.log( error );
+            res.sendStatus( 500 );
+
+        } );
+
+} );
+
 module.exports = router;
