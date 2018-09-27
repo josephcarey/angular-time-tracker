@@ -11,11 +11,14 @@
     <thead>
         <tr>
             <th>Name</th>
+            <th>Number of Entries</th>
+            <th>Action</th>
         </tr>
     </thead>
     <tbody>
         <tr ng-repeat="project in vm.displayProjects">
             <td>{{project.name}}</td>
+            <td>{{project.number_of_entries}}</td>
             <td>
                 <button ng-click="vm.deleteProject(project)">Delete</button>
             </td>

@@ -26,13 +26,14 @@ router.post( '/', ( req, res ) => {
     // thingToInsert.end_time = thingToInsert.endTime;
 
     pool.query(
-        `INSERT INTO "time_entry" ("description", "date", "start_time", "end_time")
-        VALUES ($1, $2, $3, $4)`,
+        `INSERT INTO "time_entry" ("description", "date", "start_time", "end_time", "project_id")
+        VALUES ($1, $2, $3, $4, $5)`,
         [
             /* $1 */ req.body.description,
             /* $2 */ req.body.date,
             /* $3 */ req.body.start_time,
-            /* $4 */ req.body.end_time
+            /* $4 */ req.body.end_time,
+            /* $5 */ req.body.project_id
         ]
     )
         .then( () => {
@@ -58,13 +59,14 @@ router.get( '/', ( req, res ) => {
 
     pool.query(
         `SELECT
+            "time_entry"."id",
             "time_entry"."description",
             "time_entry"."date",
             "time_entry"."start_time",
             "time_entry"."end_time",
             "project"."name" AS "project"
         FROM "time_entry"
-        JOIN "project" ON "time_entry"."project_id" = "project"."id";`
+        LEFT OUTER JOIN "project" ON "time_entry"."project_id" = "project"."id";`
     )
         .then( ( results ) => {
 

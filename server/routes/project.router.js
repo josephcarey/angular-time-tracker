@@ -49,7 +49,13 @@ router.get( '/', ( req, res ) => {
     console.log( '###', routerName, 'router /GET call.' );
 
     pool.query(
-        `SELECT * FROM "project";`
+        `SELECT
+            "project"."id",
+            "project"."name",
+            COUNT("time_entry"."project_id") AS "number_of_entries"
+        FROM "project"
+        LEFT OUTER JOIN "time_entry" ON "project"."id" = "time_entry"."project_id"
+        GROUP BY "project"."id";`
     )
         .then( ( results ) => {
 
