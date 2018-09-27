@@ -57,7 +57,14 @@ router.get( '/', ( req, res ) => {
     console.log( '###', routerName, 'router /GET call.' );
 
     pool.query(
-        `SELECT * FROM "time_entry";`
+        `SELECT
+            "time_entry"."description",
+            "time_entry"."date",
+            "time_entry"."start_time",
+            "time_entry"."end_time",
+            "project"."name" AS "project"
+        FROM "time_entry"
+        JOIN "project" ON "time_entry"."project_id" = "project"."id";`
     )
         .then( ( results ) => {
 
