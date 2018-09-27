@@ -1,1 +1,12 @@
 <h1>Project View</h1>
+
+<form ng-submit="vm.addProject(vm.newProject)">
+    <h3>Add Project</h3>
+    <!-- as simple as possible right now, we'll style once we add Material -->
+    <input type="text" ng-model="vm.newProject.name" placeholder="project name here" />
+    <input type="submit" />
+</form>
+
+
+
+<pre>{{vm | json}}</pre>
