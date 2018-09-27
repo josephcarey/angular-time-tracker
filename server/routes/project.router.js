@@ -14,7 +14,7 @@ const pool = require( '../modules/pool.js' );
 // --------------------
 
 
-// Create -- Post
+// Create -- POST
 router.post( '/', ( req, res ) => {
 
     console.log( '###', routerName, 'router /POST call:' );
@@ -40,6 +40,56 @@ router.post( '/', ( req, res ) => {
             res.sendStatus( 500 );
 
         } );
+
+} )
+
+// Read -- GET
+router.get( '/', ( req, res ) => {
+
+    console.log( '###', routerName, 'router /GET call.' );
+
+    pool.query(
+        `SELECT * FROM "project";`
+    )
+        .then( ( results ) => {
+
+            console.log( '### Back from DB with:' );
+            console.log( results.rows );
+            res.send( results.rows );
+
+        } )
+        .catch( ( error ) => {
+
+            console.log( '### Error with SQL SELECT:' );
+            console.log( error );
+            res.sendStatus( 500 );
+
+        } );
+
+} );
+
+// Update -- PUT
+
+// Delete -- DELETE
+router.delete( '/:id', ( req, res ) => {
+
+    console.log( '###', routerName, 'router /DELETE call:' );
+    console.log( req.params );
+
+    pool.query(
+        `DELETE FROM "project"
+        WHERE id = $1;`,
+        [req.params.id]
+    )
+        .then( () => {
+            console.log( '### Row successfully deleted from project.' );
+            res.sendStatus( 200 );
+        } )
+        .catch( ( error ) => {
+            console.log( '### Error with SQL DELETE:' );
+            console.log( error );
+            res.sendStatus( 500 );
+        } )
 
 } )
 

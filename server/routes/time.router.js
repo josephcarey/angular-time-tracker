@@ -90,7 +90,7 @@ router.delete( '/:id', ( req, res ) => {
         [req.params.id]
     )
         .then( () => {
-            console.log( '### Row successfully deleted from listings.' );
+            console.log( '### Row successfully deleted from time_entry.' );
             res.sendStatus( 200 );
         } )
         .catch( ( error ) => {

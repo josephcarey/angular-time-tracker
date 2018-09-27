@@ -7,6 +7,23 @@
     <input type="submit" />
 </form>
 
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="project in vm.displayProjects">
+            <td>{{project.name}}</td>
+            <td>
+                <button ng-click="vm.deleteProject(project)">Delete</button>
+            </td>
+        </tr>
+    </tbody>
+    <tfoot>
 
+    </tfoot>
+</table>
 
 <pre>{{vm | json}}</pre>
