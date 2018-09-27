@@ -51,6 +51,28 @@ timeTrackerApp.controller( 'MainController', ['$http', function ( $http ) {
 
     }
 
+
+    // Update
+
+    // Delete
+    self.deleteTimeEntry = function ( thingToDelete ) {
+
+        console.log( '--- in deleteTimeEntry:' );
+        console.log( thingToDelete );
+
+        $http.delete( `/time/${thingToDelete.id}` )
+            .then( function () {
+                alert( 'Time Entry successfully deleted!' );
+                self.getTimeEntry();
+            } )
+            .catch( function ( error ) {
+                alert( 'There was a problem deleting the Time Entry.' );
+                console.log( '--- Error in deleteTimeEntry:' );
+                console.log( error );
+            } )
+
+    }
+
     // initial calls
     self.getTimeEntry();
 

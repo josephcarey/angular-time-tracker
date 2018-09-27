@@ -76,4 +76,29 @@ router.get( '/', ( req, res ) => {
 
 } );
 
+// Update -- PUT
+
+// Delete -- DELETE
+router.delete( '/:id', ( req, res ) => {
+
+    console.log( '###', routerName, 'router /DELETE call:' );
+    console.log( req.params );
+
+    pool.query(
+        `DELETE FROM "time_entry"
+        WHERE id = $1;`,
+        [req.params.id]
+    )
+        .then( () => {
+            console.log( '### Row successfully deleted from listings.' );
+            res.sendStatus( 200 );
+        } )
+        .catch( ( error ) => {
+            console.log( '### Error with SQL DELETE:' );
+            console.log( error );
+            res.sendStatus( 500 );
+        } )
+
+} )
+
 module.exports = router;
