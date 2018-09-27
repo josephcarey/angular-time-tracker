@@ -64,7 +64,7 @@ router.get( '/', ( req, res ) => {
             "time_entry"."date",
             "time_entry"."start_time",
             "time_entry"."end_time",
-            ("time_entry"."end_time" - "time_entry"."start_time") AS "total_time",
+            TO_CHAR("time_entry"."end_time" - "time_entry"."start_time", 'HH24:MM') AS "total_time",
             "project"."name" AS "project"
         FROM "time_entry"
         LEFT OUTER JOIN "project" ON "time_entry"."project_id" = "project"."id";`
@@ -74,31 +74,31 @@ router.get( '/', ( req, res ) => {
             console.log( '### Back from DB with:' );
             console.log( results.rows );
 
-            // convert the total time from the database to something readable
+            // // convert the total time from the database to something readable
             let resultsToSend = results.rows;
-            for ( result of resultsToSend ) {
-                result.totalTime = '';
-                // concat the hours
-                if ( result.total_time.hours ) {
-                    result.totalTime += result.total_time.hours;
-                } else {
-                    result.totalTime += '0';
-                }
+            // for ( result of resultsToSend ) {
+            //     result.totalTime = '';
+            //     // concat the hours
+            //     if ( result.total_time.hours ) {
+            //         result.totalTime += result.total_time.hours;
+            //     } else {
+            //         result.totalTime += '0';
+            //     }
 
-                result.totalTime += ':';
+            //     result.totalTime += ':';
 
-                // concat the minutes
-                if ( result.total_time.minutes ) {
-                    if ( result.total_time.minutes < 10 ) {
-                        result.totalTime += '0'
-                    }
-                    result.totalTime += result.total_time.minutes;
-                } else {
-                    result.totalTime += '00';
-                }
+            //     // concat the minutes
+            //     if ( result.total_time.minutes ) {
+            //         if ( result.total_time.minutes < 10 ) {
+            //             result.totalTime += '0'
+            //         }
+            //         result.totalTime += result.total_time.minutes;
+            //     } else {
+            //         result.totalTime += '00';
+            //     }
 
-                delete result.total_time;
-            }
+            //     delete result.total_time;
+            // }
 
             res.send( resultsToSend );
 

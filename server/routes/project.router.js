@@ -50,12 +50,12 @@ router.get( '/', ( req, res ) => {
 
     pool.query(
         `SELECT
-            "project"."name",
-            COUNT("time_entry"."project_id") AS "number_of_entries",
-            SUM("time_entry"."end_time" - "time_entry"."start_time") AS "total_time"
-        FROM "project"
-        LEFT OUTER JOIN "time_entry" ON "project"."id" = "time_entry"."project_id"
-        GROUP BY "project"."id";`
+        "project"."name",
+        COUNT("time_entry"."project_id") AS "number_of_entries",
+        TO_CHAR(COALESCE(SUM("time_entry"."end_time" - "time_entry"."start_time"),'00:00'),'HH24:MI') AS "total_time"
+    FROM "project"
+    LEFT OUTER JOIN "time_entry" ON "project"."id" = "time_entry"."project_id"
+    GROUP BY "project"."id";`
     )
         .then( ( results ) => {
 
@@ -64,29 +64,43 @@ router.get( '/', ( req, res ) => {
 
             // convert the total time from the database to something readable
             let resultsToSend = results.rows;
-            for ( result of resultsToSend ) {
-                result.totalTime = '';
-                // concat the hours
-                if ( result.total_time.hours ) {
-                    result.totalTime += result.total_time.hours;
-                } else {
-                    result.totalTime += '0';
-                }
+            // for ( result of resultsToSend ) {
 
-                result.totalTime += ':';
+            //     console.log( result )
+            //     result.totalTime = '';
 
-                // concat the minutes
-                if ( result.total_time.minutes ) {
-                    if ( result.total_time.minutes < 10 ) {
-                        result.totalTime += '0'
-                    }
-                    result.totalTime += result.total_time.minutes;
-                } else {
-                    result.totalTime += '00';
-                }
+            //     // use the number of results in a thing to determine whether it is empty
+            //     // time entries must be non-null and non-negative? (we should enforce this)
+            //     // and so if it has one entry, it has at least one time
 
-                delete result.total_time;
-            }
+            //     if ( result.number_of_entries === 0 ) {
+            //         results.total_time = { hours: 0, minutes: 0 }
+            //     }
+
+            //     // fix this by checking for 
+
+            //     // concat the hours
+            //     if ( result.total_time.hasOwnProperty( hours ) ) {
+            //         result.totalTime += result.total_time.hours;
+            //     } else {
+            //         result.totalTime += '0';
+            //     }
+
+            //     result.totalTime += ':';
+
+            //     // concat the minutes
+            //     if ( result.total_time.hasOwnProperty( minutes ) ) {
+            //         if ( result.total_time.minutes < 10 ) {
+            //             result.totalTime += '0'
+            //         }
+            //         result.totalTime += result.total_time.minutes;
+            //     } else {
+            //         result.totalTime += '00';
+            //     }
+
+            //     delete result.total_time;
+
+            // }
 
             res.send( resultsToSend );
 

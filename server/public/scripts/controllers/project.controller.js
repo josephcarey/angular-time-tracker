@@ -1,4 +1,4 @@
-timeTrackerApp.controller( 'ProjectController', ['$http', function ( $http ) {
+timeTrackerApp.controller( 'ProjectController', ['$http', '$mdToast', function ( $http, $mdToast ) {
 
     // controller setup
     console.log( 'ProjectController loaded!' );
@@ -20,11 +20,11 @@ timeTrackerApp.controller( 'ProjectController', ['$http', function ( $http ) {
 
         $http.post( '/project', thingToAdd )
             .then( function () {
-                alert( 'New Project successfully added!' );
+                $mdToast.show( $mdToast.simple().textContent( 'New project created!' ) );
                 self.getProject();
             } )
             .catch( function ( error ) {
-                alert( 'There was a problem adding the new Project.' );
+                $mdToast.show( $mdToast.simple().textContent( 'There was a problem adding a project.' ) );
                 console.log( '--- Error in addProject:' );
                 console.log( error );
             } )
@@ -43,7 +43,7 @@ timeTrackerApp.controller( 'ProjectController', ['$http', function ( $http ) {
                 self.displayProjects = results.data;
             } )
             .catch( function ( error ) {
-                alert( 'There was a problem getting the Projects.' );
+                $mdToast.show( $mdToast.simple().textContent( 'There was a problem getting the projects.' ) );
                 console.log( '--- Error in getProjects:' );
                 console.log( error );
             } )
@@ -60,11 +60,11 @@ timeTrackerApp.controller( 'ProjectController', ['$http', function ( $http ) {
 
         $http.delete( `/project/${thingToDelete.id}` )
             .then( function () {
-                alert( 'Project successfully deleted!' );
+                $mdToast.show( $mdToast.simple().textContent( 'Project successfully deleted!' ) );
                 self.getProject();
             } )
             .catch( function ( error ) {
-                alert( 'There was a problem deleting the Project.' );
+                $mdToast.show( $mdToast.simple().textContent( 'There was a problem deleting the project.' ) );
                 console.log( '--- Error in deleteProject:' );
                 console.log( error );
             } )
