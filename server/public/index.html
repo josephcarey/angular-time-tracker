@@ -35,6 +35,34 @@
         <input type="submit" />
     </form>
 
+    <table>
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th>Date</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="time in vm.displayTimeEntries">
+                <td>{{time.description}}</td>
+                <td>{{time.date | date : "dd MMM yyyy"}}</td>
+                <td>{{time.start_time}}</td>
+                <td>{{time.end_time}}</td>
+            </tr>
+        </tbody>
+        <tfoot>
+
+        </tfoot>
+    </table>
+
+    <ul>
+        <li ng-repeat="time in vm.displayTimeEntries">
+            cool: {{time}}
+        </li>
+    </ul>
+
     <pre>{{vm | json}}</pre>
 
 </body>
