@@ -4,6 +4,12 @@
     <h3>Add Time Entry</h3>
     <!-- as simple as possible right now, we'll style once we add Material -->
     <input type="text" ng-model="vm.newTimeEntry.description" placeholder="what did you do?" />
+    <!-- <select ng-model="vm.newTimeEntry.project_id">
+        <option ng-repeat="project in vm.optionsProjects" value="{{project.id}}">{{project.name}}</option>
+    </select> -->
+    <select ng-model="vm.newTimeEntry.project" ng-options="project.name for project in vm.optionsProjects">
+        <option ng-value="project.id">{{project.name}}</option>
+    </select>
     <input type="text" ng-model="vm.newTimeEntry.date" placeholder="date" />
     <input type="text" ng-model="vm.newTimeEntry.startTime" placeholder="start time" />
     <input type="text" ng-model="vm.newTimeEntry.endTime" placeholder="end time" />

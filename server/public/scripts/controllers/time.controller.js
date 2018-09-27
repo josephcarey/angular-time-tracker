@@ -6,10 +6,11 @@ timeTrackerApp.controller( 'TimeController', ['$http', function ( $http ) {
 
     // variables and stuff
     self.displayTimeEntries = [];
+    self.optionsProjects = [];
 
 
     // --------------------
-    // CRUD Stuff
+    // Time CRUD Stuff
     // --------------------
 
     // Create
@@ -18,9 +19,17 @@ timeTrackerApp.controller( 'TimeController', ['$http', function ( $http ) {
         console.log( '--- in addTimeEntry:' );
         console.log( thingToAdd );
 
+        // get the project id from the project we've given it
+        // we could also use ng-repeat instead of ng-options to get the number...
+        // but even if we did that, we would have to turn the string into a number
+        thingToAdd.project_id = thingToAdd.project.id;
+        thingToAdd.start_time = thingToAdd.startTime;
+        thingToAdd.end_time = thingToAdd.endTime;
+
         $http.post( '/time', thingToAdd )
             .then( function () {
                 alert( 'New Time Entry successfully added!' );
+                self.getTimeEntry();
             } )
             .catch( function ( error ) {
                 alert( 'There was a problem adding the new Time Entry.' );
@@ -71,7 +80,31 @@ timeTrackerApp.controller( 'TimeController', ['$http', function ( $http ) {
 
     }
 
+    // --------------------
+    // Project CRUD stuff
+    // --------------------
+
+    // Read
+    self.getProject = function () {
+
+        console.log( '--- in getProject.' );
+
+        $http.get( '/project' )
+            .then( function ( results ) {
+                console.log( '--- back from the server with:' );
+                console.log( results );
+                self.optionsProjects = results.data;
+            } )
+            .catch( function ( error ) {
+                alert( 'There was a problem getting the Projects.' );
+                console.log( '--- Error in getProject:' );
+                console.log( error );
+            } )
+
+    }
+
     // initial calls
     self.getTimeEntry();
+    self.getProject();
 
 }] )

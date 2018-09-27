@@ -21,9 +21,9 @@ router.post( '/', ( req, res ) => {
     console.log( req.body );
 
     // change the post data to match the database
-    thingToInsert = req.body;
-    thingToInsert.start_time = thingToInsert.startTime;
-    thingToInsert.end_time = thingToInsert.endTime;
+    // thingToInsert = req.body;
+    // thingToInsert.start_time = thingToInsert.startTime;
+    // thingToInsert.end_time = thingToInsert.endTime;
 
     pool.query(
         `INSERT INTO "time_entry" ("description", "date", "start_time", "end_time")
