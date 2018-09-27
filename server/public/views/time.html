@@ -1,5 +1,3 @@
-<h1>TIME VIEW</h1>
-
 <form ng-submit="vm.addTimeEntry(vm.newTimeEntry)">
     <h3>Add Time Entry</h3>
     <!-- as simple as possible right now, we'll style once we add Material -->
@@ -8,7 +6,7 @@
         <option ng-repeat="project in vm.optionsProjects" value="{{project.id}}">{{project.name}}</option>
     </select> -->
     <select ng-model="vm.newTimeEntry.project" ng-options="project.name for project in vm.optionsProjects">
-        <option ng-value="project.id">{{project.name}}</option>
+        <option ng-value="project.id"></option>
     </select>
     <input type="text" ng-model="vm.newTimeEntry.date" placeholder="date" />
     <input type="text" ng-model="vm.newTimeEntry.startTime" placeholder="start time" />
@@ -23,6 +21,7 @@
             <th>Date</th>
             <th>Start Time</th>
             <th>End Time</th>
+            <th>Total Time</th>
             <th>Project</th>
             <th>Action</th>
         </tr>
@@ -33,6 +32,7 @@
             <td>{{time.date | date : "dd MMM yyyy"}}</td>
             <td>{{time.start_time}}</td>
             <td>{{time.end_time}}</td>
+            <td>{{time.totalTime}}</td>
             <td>{{time.project}}</td>
             <td>
                 <button ng-click="vm.deleteTimeEntry(time)">Delete</button>
