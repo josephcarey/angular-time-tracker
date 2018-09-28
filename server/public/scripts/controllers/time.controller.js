@@ -1,4 +1,4 @@
-timeTrackerApp.controller( 'TimeController', ['$http', function ( $http ) {
+timeTrackerApp.controller( 'TimeController', ['$http', '$mdToast', '$mdDialog', function ( $http, $mdToast, $mdDialog ) {
 
     // controller setup
     console.log( 'TimeController loaded!' );
@@ -8,6 +8,13 @@ timeTrackerApp.controller( 'TimeController', ['$http', function ( $http ) {
     self.displayTimeEntries = [];
     self.optionsProjects = [];
 
+
+    // test out making a modal pop up for adding a new time entry
+
+    self.openInputDialog = function () {
+        console.log( 'clicked!' );
+
+    }
 
     // --------------------
     // Time CRUD Stuff
@@ -19,23 +26,21 @@ timeTrackerApp.controller( 'TimeController', ['$http', function ( $http ) {
         console.log( '--- in addTimeEntry:' );
         console.log( thingToAdd );
 
-        // get the project id from the project we've given it
-        // we could also use ng-repeat instead of ng-options to get the number...
-        // but even if we did that, we would have to turn the string into a number
-        thingToAdd.project_id = thingToAdd.project.id;
         thingToAdd.start_time = thingToAdd.startTime;
         thingToAdd.end_time = thingToAdd.endTime;
 
         $http.post( '/time', thingToAdd )
             .then( function () {
-                alert( 'New Time Entry successfully added!' );
+                $mdToast.show( $mdToast.simple().textContent( 'New Time Entry created!' ) );
                 self.getTimeEntry();
             } )
             .catch( function ( error ) {
-                alert( 'There was a problem adding the new Time Entry.' );
+                $mdToast.show( $mdToast.simple().textContent( 'There was a problem adding a Time Entry.' ) );
                 console.log( '--- Error in addTimeEntry:' );
                 console.log( error );
             } )
+
+        $mdDialog.hide();
 
     } // end self.addTimeEntry
 
@@ -51,7 +56,7 @@ timeTrackerApp.controller( 'TimeController', ['$http', function ( $http ) {
                 self.displayTimeEntries = results.data;
             } )
             .catch( function ( error ) {
-                alert( 'There was a problem getting the Time Entries.' );
+                $mdToast.show( $mdToast.simple().textContent( 'There was a problem getting the Time Entries.' ) );
                 console.log( '--- Error in getTimeEntry:' );
                 console.log( error );
             } )
@@ -67,18 +72,36 @@ timeTrackerApp.controller( 'TimeController', ['$http', function ( $http ) {
         console.log( '--- in deleteTimeEntry:' );
         console.log( thingToDelete );
 
-        $http.delete( `/time/${thingToDelete.id}` )
+        let confirm = $mdDialog.confirm()
+            .title( 'Confirm Delete' )
+            .textContent( `Are you sure you want to delete this time entry?` )
+            .ok( 'Delete' )
+            .cancel( 'Cancel' );
+
+        // ask if they're sure
+        $mdDialog.show( confirm )
+
             .then( function () {
-                alert( 'Time Entry successfully deleted!' );
-                self.getTimeEntry();
+
+                $http.delete( `/time/${thingToDelete.id}` )
+                    .then( function () {
+                        $mdToast.show( $mdToast.simple().textContent( 'Time Entry successfully deleted!' ) );
+                        self.getTimeEntry();
+                    } )
+                    .catch( function ( error ) {
+                        $mdToast.show( $mdToast.simple().textContent( 'There was a problem deleting the Time Entry.' ) );
+                        console.log( '--- Error in deleteTimeEntry:' );
+                        console.log( error );
+                    } )
+
             } )
+
             .catch( function ( error ) {
-                alert( 'There was a problem deleting the Time Entry.' );
-                console.log( '--- Error in deleteTimeEntry:' );
-                console.log( error );
+                $mdToast.show( $mdToast.simple().textContent( 'Delete canceled.' ) );
             } )
 
     }
+
 
     // --------------------
     // Project CRUD stuff
@@ -96,7 +119,7 @@ timeTrackerApp.controller( 'TimeController', ['$http', function ( $http ) {
                 self.optionsProjects = results.data;
             } )
             .catch( function ( error ) {
-                alert( 'There was a problem getting the Projects.' );
+                $mdToast.show( $mdToast.simple().textContent( 'There was a problem getting the projects.' ) );
                 console.log( '--- Error in getProject:' );
                 console.log( error );
             } )
@@ -106,5 +129,67 @@ timeTrackerApp.controller( 'TimeController', ['$http', function ( $http ) {
     // initial calls
     self.getTimeEntry();
     self.getProject();
+
+
+
+
+    self.showForm = function () {
+
+        $mdDialog.show( {
+            contentElement: '#myStaticDialog',
+            parent: angular.element( document.body ),
+
+            clickOutsideToClose: true,
+            bindToController: true
+
+        } )
+    }
+
+    self.closeMe = function () {
+
+        $mdDialog.hide();
+    }
+
+
+    // let trialModal = {
+    //     templateUrl: '../../views/modal-form.html',
+    //     controller: 'ModalInstanceCtrl as vm',
+    //     autoWrap: true,
+    //     clickOutsideToClose: true
+    // }
+
+    // $mdDialog.show( trialModal )
+    //     .then( function ( e ) {
+    //         console.log( 'then!', e );
+    //     } )
+    //     .catch( function ( e ) {
+    //         console.log( 'catch!', e );
+    //     } )
+
+
+    // let confirm = $mdDialog.confirm()
+    //     .title( 'Confirm Delete' )
+    //     .textContent( `Are you sure you want to delete this time entry?` )
+    //     .ok( 'Delete' )
+    //     .cancel( 'Cancel' );
+
+    // // ask if they're sure
+    // $mdDialog.show( confirm )
+
+    //     let modalInstance = $mdDialog.prompt()
+    //         .title( '' )
+    //     // .templateUrl( '../../views/modal-form.html' )
+    //     // .controller( 'ModalInstanceCtrl' )
+
+    //     $mdDialog.show( modalInstance ).then( function ( selectedItem ) {
+    //         self.selected = selectedItem;
+    //     }, function () {
+    //         console.log( 'Modal dismissed at: ' + new Date() );
+    //     } );
+    // };
+
+
+
+
 
 }] )

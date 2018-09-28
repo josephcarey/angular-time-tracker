@@ -1,4 +1,4 @@
-const timeTrackerApp = angular.module( 'TimeTrackerApp', ['ngRoute', 'ngMaterial'] );
+const timeTrackerApp = angular.module( 'TimeTrackerApp', ['ngRoute', 'ngMaterial', 'ngMessages'] );
 
 timeTrackerApp.config( ['$routeProvider', function ( $routeProvider ) {
 
@@ -19,4 +19,11 @@ timeTrackerApp.config( ['$routeProvider', function ( $routeProvider ) {
         } )
 
 
+}] )
+
+timeTrackerApp.controller( 'MyController', ['$mdSidenav', function ( $mdSidenav ) {
+    self = this;
+    self.openLeftMenu = function () {
+        $mdSidenav( 'left' ).toggle();
+    }
 }] )

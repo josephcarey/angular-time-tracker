@@ -20,6 +20,9 @@
             <td>{{project.number_of_entries}}</td>
             <td>{{project.total_time}}</td>
             <td>
+                <button ng-click="vm.editProject(project)">Delete</button>
+            </td>
+            <td>
                 <button ng-click="vm.deleteProject(project)">Delete</button>
             </td>
         </tr>

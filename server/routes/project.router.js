@@ -49,20 +49,22 @@ router.get( '/', ( req, res ) => {
     console.log( '###', routerName, 'router /GET call.' );
 
     pool.query(
-        `SELECT
-        "project"."name",
-        COUNT("time_entry"."project_id") AS "number_of_entries",
-        TO_CHAR(COALESCE(SUM("time_entry"."end_time" - "time_entry"."start_time"),'00:00'),'HH24:MI') AS "total_time"
-    FROM "project"
-    LEFT OUTER JOIN "time_entry" ON "project"."id" = "time_entry"."project_id"
-    GROUP BY "project"."id";`
+        `
+        SELECT
+            "project"."id",
+            "project"."name",
+            COUNT("time_entry"."project_id") AS "number_of_entries",
+            TO_CHAR(COALESCE(SUM("time_entry"."end_time" - "time_entry"."start_time"),'00:00'),'HH24:MI') AS "total_time"
+        FROM "project"
+        LEFT OUTER JOIN "time_entry" ON "project"."id" = "time_entry"."project_id"
+        GROUP BY "project"."id";
+        `
     )
         .then( ( results ) => {
 
             console.log( '### Back from DB with:' );
             console.log( results.rows );
 
-            // convert the total time from the database to something readable
             let resultsToSend = results.rows;
             // for ( result of resultsToSend ) {
 
