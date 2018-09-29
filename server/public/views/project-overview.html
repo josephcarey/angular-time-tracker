@@ -1,0 +1,61 @@
+<h3>Project Overview View</h3>
+
+<button class="collapsible" ng-click="vm.toggleCollapse()">Time Entries</button>
+<div class="content">
+    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
+        dolore
+        magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+        commodo
+        consequat.</p>
+</div>
+
+
+<md-card ng-repeat="project in vm.displayProjects">
+    <md-card-title>
+        <md-card-title-text layout="row" layout-align="start center">
+            <span class="md-headline">{{project.name}}</span>
+        </md-card-title-text>
+        <md-card-title-text layout="row" layout-align="end start">
+            <md-button>Edit</md-button>
+            <md-button>Delete</md-button>
+        </md-card-title-text>
+    </md-card-title>
+    <md-card-content>
+
+
+        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Assumenda repudiandae rerum illum corporis. Nam eum
+            numquam inventore laudantium consequuntur ex amet vitae, quisquam tempore maiores voluptas, sint eius vero
+            accusantium.</p>
+
+        <table class="my-table">
+            <thead>
+                <tr>
+                    <th>task</th>
+                    <th>estimated</th>
+                    <th>actual</th>
+                    <th>accuracy</th>
+                    <th>action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="timeEntry in project.time_entries">
+                    <td>{{timeEntry.description}}</td>
+                    <td> </td>
+                    <td>{{timeEntry.total_time}}</td>
+                </tr>
+                <tr colspan="3">
+                    <td>+</td>
+                </tr>
+            </tbody>
+            <tfoot>
+
+            </tfoot>
+        </table>
+
+
+    </md-card-content>
+    <!-- <md-card-actions layout="row" layout-align="end center">
+    </md-card-actions> -->
+</md-card>
+
+<pre>{{vm | json}}</pre>

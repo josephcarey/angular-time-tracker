@@ -14,6 +14,10 @@ timeTrackerApp.config( ['$routeProvider', function ( $routeProvider ) {
             controller: "ProjectController as vm",
             templateUrl: "../views/project.html"
         } )
+        .when( '/project-overview', {
+            controller: "ProjectOverviewController as vm",
+            templateUrl: "../views/project-overview.html"
+        } )
         .otherwise( '/', {
             templateUrl: '../views/404.html'
         } )
