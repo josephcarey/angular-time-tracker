@@ -3,7 +3,7 @@
 <div layout="row">
 
     <!-- Navigation column -->
-    <div flex="20" layout="column">
+    <div flex="12" layout="column">
 
         <h3>Navigation</h3>
 
@@ -62,11 +62,11 @@
                             </td>
                             <td>
                                 {{timeEntry.start_date | date : "shortTime"}}<br />
-                                {{timeEntry.start_date | date : "mediumDate"}}
+                                {{timeEntry.start_date | date : "shortDate"}}
                             </td>
                             <td>
                                 {{timeEntry.end_date | date : "shortTime"}}<br />
-                                {{timeEntry.end_date | date : "mediumDate"}}
+                                {{timeEntry.end_date | date : "shortDate"}}
                             </td>
                             <td></td>
                         </tr>
@@ -77,10 +77,10 @@
                             </td>
                             <td>
                                 {{timeEntry.start_date | date : "shortTime"}}<br />
-                                {{timeEntry.start_date | date : "mediumDate"}}
+                                {{timeEntry.start_date | date : "shortDate"}}
                             </td>
                             <td>
-                                <button>Stop</button>
+                                <button ng-click="vm.stopTime(timeEntry.id)">Stop</button>
                             </td>
                             <td></td>
                         </tr>
@@ -89,8 +89,8 @@
                     <tfoot>
                         <tr>
                             <td colspan="4">
-                                <button>
-                                    Add new time entry
+                                <button ng-click="vm.addTime(project.id)">
+                                    Start
                                 </button>
                             </td>
                         </tr>
@@ -165,8 +165,6 @@
 
 </div>
 
-
-
 <button class="collapsible" ng-click="vm.toggleCollapse()">Time Entries</button>
 <div class="content">
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
@@ -175,64 +173,5 @@
         commodo
         consequat.</p>
 </div>
-
-
-
-
-<md-card ng-repeat="project in vm.displayProjects">
-    <md-card-title>
-        <md-card-title-text layout="row" layout-align="start center">
-            <span class="md-headline">{{project.name}}</span>
-        </md-card-title-text>
-        <md-card-title-text layout="row" layout-align="end start">
-            <md-button>Edit</md-button>
-            <md-button>Delete</md-button>
-        </md-card-title-text>
-    </md-card-title>
-    <md-card-content>
-
-
-
-
-        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Assumenda repudiandae rerum illum corporis. Nam eum
-            numquam inventore laudantium consequuntur ex amet vitae, quisquam tempore maiores voluptas, sint eius vero
-            accusantium.</p>
-
-        <ul ng-repeat="child in project.children">
-            <li>
-                <button ng-click="vm.navigateToProject(child.id)">{{child.name}}</button>
-            </li>
-        </ul>
-
-        <table class="my-table">
-            <thead>
-                <tr>
-                    <th>task</th>
-                    <th>estimated</th>
-                    <th>actual</th>
-                    <th>accuracy</th>
-                    <th>action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr ng-repeat="timeEntry in project.time_entries">
-                    <td>{{timeEntry.description}}</td>
-                    <td> </td>
-                    <td>{{timeEntry.total_time}}</td>
-                </tr>
-                <tr colspan="3">
-                    <td>+</td>
-                </tr>
-            </tbody>
-            <tfoot>
-
-            </tfoot>
-        </table>
-
-
-    </md-card-content>
-    <!-- <md-card-actions layout="row" layout-align="end center">
-    </md-card-actions> -->
-</md-card>
 
 <pre>{{vm | json}}</pre>

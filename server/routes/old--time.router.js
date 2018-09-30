@@ -20,11 +20,20 @@ router.post( '/', ( req, res ) => {
     console.log( '###', routerName, 'router /POST call:' );
     console.log( req.body );
 
+    // change the post data to match the database
+    // thingToInsert = req.body;
+    // thingToInsert.start_time = thingToInsert.startTime;
+    // thingToInsert.end_time = thingToInsert.endTime;
+
     pool.query(
-        `INSERT INTO "time_entry" ("project_id")
-        VALUES ($1)`,
+        `INSERT INTO "time_entry" ("description", "date", "start_time", "end_time", "project_id")
+        VALUES ($1, $2, $3, $4, $5)`,
         [
-            /* $1 */ req.body.project_id
+            /* $1 */ req.body.description,
+            /* $2 */ req.body.date,
+            /* $3 */ req.body.start_time,
+            /* $4 */ req.body.end_time,
+            /* $5 */ req.body.project_id
         ]
     )
         .then( () => {
@@ -80,32 +89,6 @@ router.get( '/', ( req, res ) => {
 } );
 
 // Update -- PUT
-router.put( '/stop/:id', ( req, res ) => {
-
-    console.log( '###', routerName, 'router /stop PUT call:' );
-    console.log( req.params );
-
-    pool.query(
-        `
-        UPDATE "time_entry"
-        SET "end_date" = NOW()
-        WHERE "id" = $1;
-        `,
-        [
-            /* $1 */ req.params.id
-        ]
-    )
-        .then( () => {
-            console.log( '### Row successfully updated (stopped) on time_entry.' );
-            res.sendStatus( 200 );
-        } )
-        .catch( ( error ) => {
-            console.log( '### Error with SQL UPDATE:' );
-            console.log( error );
-            res.sendStatus( 500 );
-        } )
-
-} )
 
 // Delete -- DELETE
 router.delete( '/:id', ( req, res ) => {

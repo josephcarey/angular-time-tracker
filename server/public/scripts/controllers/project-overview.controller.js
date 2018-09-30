@@ -1,19 +1,17 @@
 timeTrackerApp.controller( 'ProjectOverviewController', ['$http', '$mdToast', '$mdDialog', function ( $http, $mdToast, $mdDialog ) {
 
-
     // controller setup
-    console.log( 'ProjectOverviewController loaded!' );
     const self = this;
 
     // variables and stuff
     self.displayProjects = [];
-    self.newAllProjects = [];
 
     // navigation stuff
     self.currentProject = 0;
     self.parentProject = 0;
 
 
+    // collapsible stuff
     var coll = document.getElementsByClassName( "collapsible" );
     var i;
 
@@ -29,37 +27,37 @@ timeTrackerApp.controller( 'ProjectOverviewController', ['$http', '$mdToast', '$
         } );
     }
 
+    self.addTime = function ( projectID ) {
 
-    // Read
-    self.getProject = function () {
-
-        console.log( '--- in getProject.' );
-
-        $http.get( '/project/all' )
-            .then( function ( results ) {
-                console.log( '--- back from the server with:' );
-                console.log( results );
-                self.displayProjects = results.data;
-
+        $http.post( '/time', { project_id: projectID } )
+            .then( function () {
+                self.navigateToProject( self.currentProject );
             } )
             .catch( function ( error ) {
-                $mdToast.show( $mdToast.simple().textContent( 'There was a problem getting the projects.' ) );
-                console.log( '--- Error in getProjects:' );
+                $mdToast.show( $mdToast.simple().textContent( 'There was a problem adding a new time to this project.' ) );
+                console.log( '--- Error in addTime:' );
+                console.log( error );
+            } )
+    }
+
+    self.stopTime = function ( timeEntryID ) {
+
+        $http.put( `/time/stop/${timeEntryID}`, {} )
+            .then( function () {
+                self.navigateToProject( self.currentProject );
+            } )
+            .catch( function ( error ) {
+                $mdToast.show( $mdToast.simple().textContent( 'There was a problem stopping the time.' ) );
+                console.log( '--- Error in stopTime:' );
                 console.log( error );
             } )
 
     }
 
-
-    $http.get( '/project/special' )
-        .then( function ( results ) {
-            self.newAllProjects = results.data;
-        } )
-
-
     self.navigateToProject = function ( destinationProject ) {
 
-        console.log( 'destinationProject:', destinationProject );
+        console.log( 'destination project:', destinationProject );
+        console.log( 'current project:', self.currentProject )
 
 
         if ( destinationProject == 0 ) {
@@ -67,12 +65,14 @@ timeTrackerApp.controller( 'ProjectOverviewController', ['$http', '$mdToast', '$
             $http.get( `/project/special/` )
 
                 .then( function ( results ) {
-                    console.log( results.data );
                     self.displayProjects = results.data;
                     self.currentProject = destinationProject;
-                    console.log( 'self.displayProjects.parent_id:', results.data[0].parent_id );
-
-                    self.parentProject = self.displayProjects[0].parent_id || 0;
+                    self.parentProject = 0;
+                } )
+                .catch( function ( error ) {
+                    $mdToast.show( $mdToast.simple().textContent( 'There was a problem getting the projects.' ) );
+                    console.log( '--- Error in getProjects:' );
+                    console.log( error );
                 } )
 
         } else {
@@ -80,17 +80,21 @@ timeTrackerApp.controller( 'ProjectOverviewController', ['$http', '$mdToast', '$
             $http.get( `/project/special/${destinationProject}` )
 
                 .then( function ( results ) {
-                    console.log( results.data );
                     self.displayProjects = results.data;
                     self.currentProject = destinationProject;
-                    console.log( 'self.displayProjects.parent_id:', results.data[0].parent_id );
                     self.parentProject = self.displayProjects[0].parent_id || 0;
+                } )
+                .catch( function ( error ) {
+                    $mdToast.show( $mdToast.simple().textContent( 'There was a problem getting the projects.' ) );
+                    console.log( '--- Error in getProjects:' );
+                    console.log( error );
+                    self.navigateToProject( 0 );
                 } )
 
         }
     }
 
     // initial calls
-    // self.getProject();
+    self.navigateToProject( 0 );
 
 }] )
