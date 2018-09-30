@@ -9,7 +9,9 @@ timeTrackerApp.controller( 'ProjectOverviewController', ['$http', '$mdToast', '$
     self.displayProjects = [];
     self.newAllProjects = [];
 
-
+    // navigation stuff
+    self.currentProject = 0;
+    self.parentProject = 0;
 
 
     var coll = document.getElementsByClassName( "collapsible" );
@@ -54,7 +56,33 @@ timeTrackerApp.controller( 'ProjectOverviewController', ['$http', '$mdToast', '$
             self.newAllProjects = results.data;
         } )
 
+
+    self.navigateToProject = function ( destinationProject ) {
+
+        if ( destinationProject == 0 ) {
+
+            $http.get( `/project/special/` )
+
+                .then( function ( results ) {
+                    console.log( results.data );
+                    self.displayProjects = results.data;
+
+                } )
+
+        } else {
+
+
+            $http.get( `/project/special/${destinationProject}` )
+
+                .then( function ( results ) {
+                    console.log( results.data );
+                    self.displayProjects = results.data;
+                } )
+
+        }
+    }
+
     // initial calls
-    self.getProject();
+    // self.getProject();
 
 }] )

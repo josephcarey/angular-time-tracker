@@ -9,6 +9,12 @@
         consequat.</p>
 </div>
 
+<form ng-submit="vm.navigateToProject(vm.destinationProject)">
+    <h3>Navigate to Project</h3>
+    <input flex="50" type="number" ng-model="vm.destinationProject" placeholder="Where to?" />
+    <input flex="50" class="md-button md-primary md-raised" type="submit" />
+</form>
+
 
 <md-card ng-repeat="project in vm.displayProjects">
     <md-card-title>
@@ -23,9 +29,17 @@
     <md-card-content>
 
 
+
+
         <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Assumenda repudiandae rerum illum corporis. Nam eum
             numquam inventore laudantium consequuntur ex amet vitae, quisquam tempore maiores voluptas, sint eius vero
             accusantium.</p>
+
+        <ul ng-repeat="child in project.children">
+            <li>
+                {{child.name}}
+            </li>
+        </ul>
 
         <table class="my-table">
             <thead>

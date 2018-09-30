@@ -146,7 +146,51 @@ router.delete( '/:id', ( req, res ) => {
 // --------------------
 // --------------------
 
+router.get( '/special/:id', ( req, res ) => {
+
+    console.log( '###', routerName, '/all router /GET call.' );
+
+    pool.query(
+        `
+        SELECT
+	"parent".*,
+	COALESCE(json_agg("time_entry") FILTER (WHERE "time_entry"."id" IS NOT NULL), '[]') AS "time_entries",
+	COALESCE(json_agg("child") FILTER (WHERE "child"."id" IS NOT NULL), '[]') AS "children"
+	FROM "project" "parent"
+	LEFT OUTER JOIN "project" "child" ON "parent"."id" = "child"."parent_id"
+    LEFT OUTER JOIN "time_entry" ON "parent"."id" = "time_entry"."project_id"
+    WHERE "parent"."id" = $1
+	GROUP BY "parent"."id";
+        `,
+        [
+            /* $1 */ req.params.id
+        ]
+    )
+        .then( ( results ) => {
+
+            console.log( '### Back from DB with:' );
+            console.log( results.rows );
+            res.send( results.rows );
+
+        } )
+        .catch( ( error ) => {
+
+            console.log( '### Error with SQL SELECT:' );
+            console.log( error );
+            res.sendStatus( 500 );
+
+        } );
+
+} );
+
 router.get( '/special', ( req, res ) => {
+
+    if ( req.params.id === null ) {
+        console.log( '### this filters nulls correctly!' );
+    } else {
+        console.log( '### req.params.id:', req.params.id );
+
+    }
 
     console.log( '###', routerName, '/all router /GET call.' );
 
