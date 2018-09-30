@@ -59,6 +59,9 @@ timeTrackerApp.controller( 'ProjectOverviewController', ['$http', '$mdToast', '$
 
     self.navigateToProject = function ( destinationProject ) {
 
+        console.log( 'destinationProject:', destinationProject );
+
+
         if ( destinationProject == 0 ) {
 
             $http.get( `/project/special/` )
@@ -66,17 +69,22 @@ timeTrackerApp.controller( 'ProjectOverviewController', ['$http', '$mdToast', '$
                 .then( function ( results ) {
                     console.log( results.data );
                     self.displayProjects = results.data;
+                    self.currentProject = destinationProject;
+                    console.log( 'self.displayProjects.parent_id:', results.data[0].parent_id );
 
+                    self.parentProject = self.displayProjects[0].parent_id || 0;
                 } )
 
         } else {
-
 
             $http.get( `/project/special/${destinationProject}` )
 
                 .then( function ( results ) {
                     console.log( results.data );
                     self.displayProjects = results.data;
+                    self.currentProject = destinationProject;
+                    console.log( 'self.displayProjects.parent_id:', results.data[0].parent_id );
+                    self.parentProject = self.displayProjects[0].parent_id || 0;
                 } )
 
         }

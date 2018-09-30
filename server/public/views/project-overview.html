@@ -1,5 +1,172 @@
 <h3>Project Overview View</h3>
 
+<div layout="row">
+
+    <!-- Navigation column -->
+    <div flex="20" layout="column">
+
+        <h3>Navigation</h3>
+
+        <button class="md-button md-primary md-raised" ng-click="vm.navigateToProject(vm.parentProject)">
+            Up a Level
+        </button>
+
+        <button class="md-button md-primary md-raised" ng-click="vm.navigateToProject(0)">
+            Root
+        </button>
+
+        <form ng-submit="vm.navigateToProject(vm.destinationProject)">
+            <div layout="row" flex="100">
+                <input flex="40" type="number" ng-model="vm.destinationProject" placeholder="Where to?" />
+                <input flex="40" class="md-button md-primary md-raised" type="submit" />
+            </div>
+        </form>
+
+    </div>
+
+    <!-- project column -->
+    <div flex="40" layout="column">
+
+        <h3>Project</h3>
+
+        <md-card ng-repeat="project in vm.displayProjects">
+            <md-card-title>
+                <md-card-title-text layout="row" layout-align="start center">
+                    <span class="md-headline">{{project.name}}</span>
+                </md-card-title-text>
+            </md-card-title>
+            <md-card-content>
+
+                <p>{{project.description}}</p>
+
+                <ul ng-repeat="child in project.children">
+                    <li>
+                        <button ng-click="vm.navigateToProject(child.id)">{{child.name}}</button>
+                    </li>
+                </ul>
+
+                <table class="my-table">
+                    <thead>
+                        <tr>
+                            <th>action</th>
+                            <th>start time</th>
+                            <th>end time</th>
+                            <th>total time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="timeEntry in project.time_entries" ng-show="timeEntry.end_date">
+                            <td>
+                                <button>E</button>
+                                <button>D</button>
+                            </td>
+                            <td>
+                                {{timeEntry.start_date | date : "shortTime"}}<br />
+                                {{timeEntry.start_date | date : "mediumDate"}}
+                            </td>
+                            <td>
+                                {{timeEntry.end_date | date : "shortTime"}}<br />
+                                {{timeEntry.end_date | date : "mediumDate"}}
+                            </td>
+                            <td></td>
+                        </tr>
+                        <tr ng-repeat="timeEntry in project.time_entries" ng-show="!timeEntry.end_date">
+                            <td>
+                                <button>E</button>
+                                <button>D</button>
+                            </td>
+                            <td>
+                                {{timeEntry.start_date | date : "shortTime"}}<br />
+                                {{timeEntry.start_date | date : "mediumDate"}}
+                            </td>
+                            <td>
+                                <button>Stop</button>
+                            </td>
+                            <td></td>
+                        </tr>
+
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="4">
+                                <button>
+                                    Add new time entry
+                                </button>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+
+            </md-card-content>
+            <md-card-actions layout="row" layout-align="front center">
+                <md-button>Edit</md-button>
+                <md-button>Delete</md-button>
+            </md-card-actions>
+        </md-card>
+
+    </div>
+
+    <!-- sub-project column -->
+    <div flex="40" layout="column">
+
+        <h3>Sub-Project</h3>
+
+        <div ng-repeat="project in vm.displayProjects">
+
+            <md-card ng-repeat="child in project.children">
+                <md-card-title>
+                    <md-card-title-text layout="row" layout-align="start center">
+                        <span class="md-headline">{{child.name}}</span>
+                    </md-card-title-text>
+                    <md-card-title-text layout="row" layout-align="end start">
+                        <md-button>Edit</md-button>
+                        <md-button>Delete</md-button>
+                    </md-card-title-text>
+                </md-card-title>
+                <md-card-content>
+
+                    <p>{{child.description}}</p>
+
+                    <table class="my-table">
+                        <thead>
+                            <tr>
+                                <th>task</th>
+                                <th>estimated</th>
+                                <th>actual</th>
+                                <th>accuracy</th>
+                                <th>action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="timeEntry in project.time_entries">
+                                <td>{{timeEntry.description}}</td>
+                                <td> </td>
+                                <td>{{timeEntry.total_time}}</td>
+                            </tr>
+                            <tr colspan="3">
+                                <td>+</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+
+                        </tfoot>
+                    </table>
+
+
+                </md-card-content>
+                <!-- <md-card-actions layout="row" layout-align="end center">
+                                </md-card-actions> -->
+            </md-card>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
 <button class="collapsible" ng-click="vm.toggleCollapse()">Time Entries</button>
 <div class="content">
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
@@ -9,11 +176,7 @@
         consequat.</p>
 </div>
 
-<form ng-submit="vm.navigateToProject(vm.destinationProject)">
-    <h3>Navigate to Project</h3>
-    <input flex="50" type="number" ng-model="vm.destinationProject" placeholder="Where to?" />
-    <input flex="50" class="md-button md-primary md-raised" type="submit" />
-</form>
+
 
 
 <md-card ng-repeat="project in vm.displayProjects">
@@ -37,7 +200,7 @@
 
         <ul ng-repeat="child in project.children">
             <li>
-                {{child.name}}
+                <button ng-click="vm.navigateToProject(child.id)">{{child.name}}</button>
             </li>
         </ul>
 
