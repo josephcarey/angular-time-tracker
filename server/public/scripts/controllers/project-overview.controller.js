@@ -128,6 +128,42 @@ timeTrackerApp.controller( 'ProjectOverviewController', ['$http', '$mdToast', '$
         }
     }
 
+    // Delete
+    self.deleteTime = function ( thingToDelete ) {
+
+        console.log( '--- in deleteTime:' );
+        console.log( thingToDelete );
+
+        let confirm = $mdDialog.confirm()
+            .title( 'Confirm Delete' )
+            .textContent( `Are you sure you want to delete this time entry?` )
+            .ok( 'Delete' )
+            .cancel( 'Cancel' );
+
+        // ask if they're sure
+        $mdDialog.show( confirm )
+
+            .then( function () {
+
+                $http.delete( `/time/${thingToDelete.id}` )
+                    .then( function () {
+                        $mdToast.show( $mdToast.simple().textContent( 'Time Entry successfully deleted!' ) );
+                        self.navigateToProject( self.currentProject );
+                    } )
+                    .catch( function ( error ) {
+                        $mdToast.show( $mdToast.simple().textContent( 'There was a problem deleting the Time Entry.' ) );
+                        console.log( '--- Error in deleteTimeEntry:' );
+                        console.log( error );
+                    } )
+
+            } )
+
+            .catch( function ( error ) {
+                $mdToast.show( $mdToast.simple().textContent( 'Delete canceled.' ) );
+            } )
+
+    }
+
     // initial calls
     self.navigateToProject( 0 );
 
