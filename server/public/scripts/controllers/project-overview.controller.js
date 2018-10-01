@@ -5,6 +5,8 @@ timeTrackerApp.controller( 'ProjectOverviewController', ['$http', '$mdToast', '$
 
     // variables and stuff
     self.displayProjects = [];
+    self.timeToEdit = {};
+    self.timeToDelete = {};
 
     // navigation stuff
     self.currentProject = 0;
@@ -52,6 +54,38 @@ timeTrackerApp.controller( 'ProjectOverviewController', ['$http', '$mdToast', '$
                 console.log( error );
             } )
 
+    }
+
+    self.stageEditTime = function ( timeToPutInEdit ) {
+
+        self.timeToEdit = timeToPutInEdit;
+
+        $mdDialog.show( {
+            contentElement: '#editTimeDialog',
+            parent: angular.element( document.body ),
+            clickOutsideToClose: true,
+            bindToController: true
+        } )
+
+
+    }
+
+    self.editTime = function ( timeToEdit ) {
+
+        $http.put( `/time/${timeToEdit.id}`, timeToEdit )
+            .then( function () {
+                self.navigateToProject( self.currentProject );
+            } )
+            .catch( function ( error ) {
+                $mdToast.show( $mdToast.simple().textContent( 'There was a problem editing the time.' ) );
+                console.log( '--- Error in editTime:' );
+                console.log( error );
+            } )
+
+    }
+
+    self.closeMe = function () {
+        $mdDialog.hide();
     }
 
     self.navigateToProject = function ( destinationProject ) {

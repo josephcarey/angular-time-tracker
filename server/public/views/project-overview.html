@@ -57,7 +57,7 @@
                     <tbody>
                         <tr ng-repeat="timeEntry in project.time_entries" ng-show="timeEntry.end_date">
                             <td>
-                                <button>E</button>
+                                <button ng-click="vm.stageEditTime(timeEntry)">E</button>
                                 <button>D</button>
                             </td>
                             <td>
@@ -175,3 +175,20 @@
 </div>
 
 <pre>{{vm | json}}</pre>
+
+<!-- Edit Time Dialog -->
+<div style="visibility: hidden" layout="column">
+    <div class="md-dialog-container" id="editTimeDialog">
+        <md-dialog>
+            <form ng-submit="vm.editTime(vm.timeToEdit)">
+                <h3>Edit Time Entry</h3>
+                <input type="text" ng-model="vm.timeToEdit.start_date" placeholder="start_time" />
+                <input type="text" ng-model="vm.timeToEdit.end_date" placeholder="end_time" />
+                <input type="number" ng-model="vm.timeToEdit.project_id" placeholder="parent_id" />
+                <button flex="50" class="md-button" ng-click="vm.closeMe()">Close</button>
+                <input flex="50" class="md-button md-primary md-raised" type="submit" ng-click="vm.closeMe()" />
+    </div>
+    </form>
+    </md-dialog>
+</div>
+</div>
