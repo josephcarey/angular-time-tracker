@@ -23,3 +23,6 @@ A time tracking app in AngularJS with AngularJS Material.
 - Node.js
 - pg
 - postgresql
+
+## Thanks
+- all the Rigel folks!
