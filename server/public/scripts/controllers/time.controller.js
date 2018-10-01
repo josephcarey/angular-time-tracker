@@ -6,6 +6,7 @@ timeTrackerApp.controller( 'TimeController', ['$http', '$mdToast', '$mdDialog', 
 
     // variables and stuff
     self.displayTimeEntries = [];
+    self.displayProjects = [];
     self.optionsProjects = [];
 
 
@@ -65,9 +66,39 @@ timeTrackerApp.controller( 'TimeController', ['$http', '$mdToast', '$mdDialog', 
 
 
     // Update
+    self.stageEditTime = function ( timeToPutInEdit ) {
+
+        console.log( 'in stage edit time' );
+
+
+        self.timeToEdit = timeToPutInEdit;
+
+        $mdDialog.show( {
+            contentElement: '#editTimeDialog',
+            parent: angular.element( document.body ),
+            clickOutsideToClose: true,
+            bindToController: true
+        } )
+
+
+    }
+
+    self.editTime = function ( timeToEdit ) {
+
+        $http.put( `/time/${timeToEdit.id}`, timeToEdit )
+            .then( function () {
+                self.navigateToProject( self.currentProject );
+            } )
+            .catch( function ( error ) {
+                $mdToast.show( $mdToast.simple().textContent( 'There was a problem editing the time.' ) );
+                console.log( '--- Error in editTime:' );
+                console.log( error );
+            } )
+
+    }
 
     // Delete
-    self.deleteTimeEntry = function ( thingToDelete ) {
+    self.deleteTime = function ( thingToDelete ) {
 
         console.log( '--- in deleteTimeEntry:' );
         console.log( thingToDelete );
@@ -116,7 +147,7 @@ timeTrackerApp.controller( 'TimeController', ['$http', '$mdToast', '$mdDialog', 
             .then( function ( results ) {
                 console.log( '--- back from the server with:' );
                 console.log( results );
-                self.optionsProjects = results.data;
+                self.displayProjects = results.data;
             } )
             .catch( function ( error ) {
                 $mdToast.show( $mdToast.simple().textContent( 'There was a problem getting the projects.' ) );
@@ -126,70 +157,78 @@ timeTrackerApp.controller( 'TimeController', ['$http', '$mdToast', '$mdDialog', 
 
     }
 
-    // initial calls
-    self.getTimeEntry();
-    self.getProject();
+    self.stageEditProject = function ( projectToPutInEdit ) {
 
-
-
-
-    self.showForm = function () {
+        self.projectToEdit = projectToPutInEdit;
 
         $mdDialog.show( {
-            contentElement: '#myStaticDialog',
+            contentElement: '#editProjectDialog',
             parent: angular.element( document.body ),
-
             clickOutsideToClose: true,
             bindToController: true
-
         } )
+
+
     }
 
-    self.closeMe = function () {
+    self.editProject = function ( projectToEdit ) {
 
+        $http.put( `/project/${projectToEdit.id}`, projectToEdit )
+            .then( function () {
+                self.navigateToProject( self.currentProject );
+            } )
+            .catch( function ( error ) {
+                $mdToast.show( $mdToast.simple().textContent( 'There was a problem editing the project.' ) );
+                console.log( '--- Error in editProject:' );
+                console.log( error );
+            } )
+
+    }
+
+    self.deleteProject = function ( thingToDelete ) {
+
+        console.log( '--- in deleteProject:' );
+        console.log( thingToDelete );
+
+        let confirm = $mdDialog.confirm()
+            .title( 'Confirm Delete' )
+            .textContent( `Are you sure you want to delete this project?` )
+            .ok( 'Delete' )
+            .cancel( 'Cancel' );
+
+        // ask if they're sure
+        $mdDialog.show( confirm )
+
+            .then( function () {
+
+                $http.delete( `/project/${thingToDelete.id}` )
+                    .then( function () {
+                        $mdToast.show( $mdToast.simple().textContent( 'Project successfully deleted!' ) );
+                        self.navigateToProject( self.currentProject );
+                    } )
+                    .catch( function ( error ) {
+                        $mdToast.show( $mdToast.simple().textContent( 'There was a problem deleting the Project.' ) );
+                        console.log( '--- Error in deleteProject:' );
+                        console.log( error );
+                    } )
+
+            } )
+
+            .catch( function ( error ) {
+                $mdToast.show( $mdToast.simple().textContent( 'Delete canceled.' ) );
+            } )
+    }
+
+    // --------------------
+    // Other
+    // --------------------
+
+    self.closeMe = function () {
         $mdDialog.hide();
     }
 
-
-    // let trialModal = {
-    //     templateUrl: '../../views/modal-form.html',
-    //     controller: 'ModalInstanceCtrl as vm',
-    //     autoWrap: true,
-    //     clickOutsideToClose: true
-    // }
-
-    // $mdDialog.show( trialModal )
-    //     .then( function ( e ) {
-    //         console.log( 'then!', e );
-    //     } )
-    //     .catch( function ( e ) {
-    //         console.log( 'catch!', e );
-    //     } )
-
-
-    // let confirm = $mdDialog.confirm()
-    //     .title( 'Confirm Delete' )
-    //     .textContent( `Are you sure you want to delete this time entry?` )
-    //     .ok( 'Delete' )
-    //     .cancel( 'Cancel' );
-
-    // // ask if they're sure
-    // $mdDialog.show( confirm )
-
-    //     let modalInstance = $mdDialog.prompt()
-    //         .title( '' )
-    //     // .templateUrl( '../../views/modal-form.html' )
-    //     // .controller( 'ModalInstanceCtrl' )
-
-    //     $mdDialog.show( modalInstance ).then( function ( selectedItem ) {
-    //         self.selected = selectedItem;
-    //     }, function () {
-    //         console.log( 'Modal dismissed at: ' + new Date() );
-    //     } );
-    // };
-
-
-
-
+    // initial calls
+    self.getTimeEntry();
+    self.getProject();
 
 }] )

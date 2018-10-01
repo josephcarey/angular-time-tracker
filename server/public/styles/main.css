@@ -18,6 +18,8 @@ th {
     font-size: 15px;
 }
 
+.my-10 { font-size: 10px; }
+
 .active, .collapsible:hover {
     background-color: #555;
 }

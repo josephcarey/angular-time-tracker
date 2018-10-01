@@ -52,11 +52,10 @@ router.get( '/', ( req, res ) => {
         `
         SELECT
             "time_entry"."id",
-            "time_entry"."description",
-            "time_entry"."date",
-            "time_entry"."start_time",
-            "time_entry"."end_time",
-            TO_CHAR("time_entry"."end_time" - "time_entry"."start_time", 'HH24:MI') AS "total_time",
+            "time_entry"."start_date",
+            "time_entry"."end_date",
+            "time_entry"."project_id",
+            TO_CHAR("time_entry"."end_date" - "time_entry"."start_date", 'HH24:MI') AS "total_time",
             "project"."name" AS "project"
         FROM "time_entry"
         LEFT OUTER JOIN "project" ON "time_entry"."project_id" = "project"."id";
@@ -99,7 +98,7 @@ router.put( '/:id', ( req, res ) => {
             /* $1 */ req.body.start_date,
             /* $1 */ req.body.end_date,
             /* $1 */ req.body.project_id,
-            /* $1 */ req.params.id,
+            /* $1 */ req.params.id
         ]
     )
         .then( () => {

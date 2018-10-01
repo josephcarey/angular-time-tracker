@@ -1,0 +1,56 @@
+<!-- Edit Time Entry Modal -->
+<div style="visibility: hidden" layout="column">
+    <div class="md-dialog-container md-padding" id="editTimeDialog">
+        <md-dialog>
+            <form ng-submit="vm.editTime(vm.timeToEdit)">
+                <h3>Edit Time Entry</h3>
+                <input type="text" ng-model="vm.timeToEdit.start_date" placeholder="date" />
+                <input type="text" ng-model="vm.timeToEdit.end_date" placeholder="start time" />
+                <input type="number" ng-model="vm.timeToEdit.project_id" placeholder="end time" />
+                <div layout="row">
+                    <button flex="50" class="md-button" ng-click="vm.deleteTime(vm.timeToEdit)">Delete</button>
+                    <button flex="50" class="md-button" ng-click="vm.closeMe()">Close</button>
+                    <input flex="50" class="md-button md-primary md-raised" type="submit" ng-click="vm.closeMe()" />
+                </div>
+            </form>
+        </md-dialog>
+    </div>
+</div>
+
+<!-- add Project Modal -->
+<div style="visibility: hidden" layout="column">
+    <div class="md-dialog-container md-padding" id="addProjectDialog">
+        <md-dialog>
+            <form ng-submit="vm.addProject(vm.projectToAdd)">
+                <h3>Add Project</h3>
+                <input type="text" ng-model="vm.projectToAdd.name" placeholder="name" />
+                <input type="text" ng-model="vm.projectToAdd.description" placeholder="description" />
+                <input type="text" ng-model="vm.projectToAdd.estimated_time" placeholder="estimated time" />
+                <input type="number" ng-model="vm.projectToAdd.parent_id" placeholder="parent id" />
+                <div layout="row">
+                    <button flex="50" class="md-button" ng-click="vm.closeMe()">Close</button>
+                    <input flex="50" class="md-button md-primary md-raised" type="submit" ng-click="vm.closeMe()" />
+                </div>
+            </form>
+        </md-dialog>
+    </div>
+</div>
+
+<!-- Edit Project Modal -->
+<div style="visibility: hidden" layout="column">
+    <div class="md-dialog-container md-padding" id="editProjectDialog">
+        <md-dialog>
+            <form ng-submit="vm.editProject(vm.projectToEdit)">
+                <h3>Edit Project</h3>
+                <input type="text" ng-model="vm.projectToEdit.name" placeholder="name" />
+                <input type="text" ng-model="vm.projectToEdit.description" placeholder="description" />
+                <input type="text" ng-model="vm.projectToEdit.estimated_time" placeholder="estimated time" />
+                <input type="number" ng-model="vm.projectToEdit.parent_id" placeholder="parent id" />
+                <div layout="row">
+                    <button flex="50" class="md-button" ng-click="vm.closeMe()">Close</button>
+                    <input flex="50" class="md-button md-primary md-raised" type="submit" ng-click="vm.closeMe()" />
+                </div>
+            </form>
+        </md-dialog>
+    </div>
+</div>

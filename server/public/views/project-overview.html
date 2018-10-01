@@ -23,7 +23,7 @@
         </md-card-header> -->
 
 
-        <md-card-title>
+        <md-card-title ng-click="vm.navigateToProject(project.id)">
             <md-card-title-text layout="column" layout-align="start start">
                 <span class="md-display-1">{{project.name}}</span>
                 <span class="md-subhead">{{project.description}}</span>
@@ -43,9 +43,9 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td>2:00</td>
-                        <td>3:00</td>
-                        <td>150%</td>
+                        <td>-:--</td>
+                        <td>-:--</td>
+                        <td>000%</td>
                     </tr>
                 </tbody>
                 <tfoot>
@@ -56,8 +56,8 @@
             <div class="md-padding">
             </div>
 
-            <div class="md-padding">
-                <span class="md-body md-padding">Tap a sub-project for details</span>
+            <div layout="column" layout-align="center center">
+                <span class="md-caption">Tap a sub-project for details</span>
             </div>
 
             <md-card ng-repeat="child in project.children" ng-click="vm.navigateToProject(child.id)">
@@ -85,9 +85,9 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td>2:00</td>
-                                <td>3:00</td>
-                                <td>150%</td>
+                                <td>-:--</td>
+                                <td>-:--</td>
+                                <td>000%</td>
                             </tr>
                         </tbody>
                         <tfoot>
@@ -100,6 +100,10 @@
 
             <h3>Time Entries</h3>
             <table class="my-table">
+                <col width="4%">
+                <col width="32%">
+                <col width="32%">
+                <col width="32%">
                 <thead>
                     <tr>
                         <th></th>
@@ -111,30 +115,46 @@
                 <tbody>
                     <tr ng-repeat="timeEntry in project.time_entries" ng-show="timeEntry.end_date">
                         <td>
-                            <button ng-click="vm.stageEditTime(timeEntry)">E</button>
-                            <button ng-click="vm.deleteTime(timeEntry)">D</button>
+                            <div layout="row">
+                                <md-button class="md-icon-button" ng-click="vm.stageEditTime(timeEntry)">
+                                    <i class="material-icons" style="font-size: 16px;">settings</i>
+                                </md-button>
+                                <!-- <md-button class="md-icon-button" ng-click="vm.deleteTime(timeEntry)">
+                                    <i class="material-icons" style="font-size: 16px;">delete</i>
+                                </md-button> -->
+                            </div>
                         </td>
                         <td>
-                            {{timeEntry.start_date | date : "shortTime"}}<br />
-                            {{timeEntry.start_date | date : "shortDate"}}
+                            <span class="md-caption">
+                                {{timeEntry.start_date | date : "shortTime"}}<br />
+                                {{timeEntry.start_date | date : "shortDate"}}
+                            </span>
                         </td>
                         <td>
-                            {{timeEntry.end_date | date : "shortTime"}}<br />
-                            {{timeEntry.end_date | date : "shortDate"}}
+                            <span class="md-caption">
+                                {{timeEntry.end_date | date : "shortTime"}}<br />
+                                {{timeEntry.end_date | date : "shortDate"}}
+                            </span>
                         </td>
                         <td></td>
                     </tr>
                     <tr ng-repeat="timeEntry in project.time_entries" ng-show="!timeEntry.end_date">
                         <td>
-                            <button ng-click="vm.stageEditTime(timeEntry)">E</button>
-                            <button ng-click="vm.deleteTime(timeEntry)">D</button>
+                            <md-button class="md-icon-button" ng-click="vm.stageEditTime(timeEntry)">
+                                <i class="material-icons" style="font-size: 16px;">settings</i>
+                            </md-button>
+                            <!-- <md-button class="md-icon-button" ng-click="vm.deleteTime(timeEntry)">
+                                <i class="material-icons">delete</i>
+                            </md-button> -->
                         </td>
                         <td>
-                            {{timeEntry.start_date | date : "shortTime"}}<br />
-                            {{timeEntry.start_date | date : "shortDate"}}
+                            <span class="md-caption">
+                                {{timeEntry.start_date | date : "shortTime"}}<br />
+                                {{timeEntry.start_date | date : "shortDate"}}
+                            </span>
                         </td>
                         <td>
-                            <button ng-click="vm.stopTime(timeEntry.id)">Stop</button>
+                            <button class="md-button md-secondary md-raised" ng-click="vm.stopTime(timeEntry.id)">Stop</button>
                         </td>
                         <td></td>
                     </tr>
@@ -142,9 +162,10 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="4">
-                            <button ng-click="vm.addTime(project.id)">
-                                Start
+                        <td></td>
+                        <td colspan="3">
+                            <button class="md-button md-primary md-raised" ng-click="vm.addTime(project.id)">
+                                New time entry...
                             </button>
                         </td>
                     </tr>
@@ -155,12 +176,26 @@
         </md-card-content>
 
         <md-card-actions layout="row" layout-align="front center">
-            <md-button>Edit</md-button>
-            <md-button>Delete</md-button>
+            <md-button class="md-icon-button" ng-click="vm.stageEditProject(project)">
+                <i class="material-icons">settings</i>
+            </md-button>
+            <md-button class="md-icon-button" ng-click="vm.deleteProject(project)">
+                <i class="material-icons">delete</i>
+            </md-button>
         </md-card-actions>
 
     </md-card>
 
+    <md-card ng-click="vm.stageAddProject(vm.currentProject)">
 
+        <md-card-title>
+            <md-card-title-text layout="column" layout-align="start start">
+                <span class="md-display-1">Add new project...</span>
+            </md-card-title-text>
+        </md-card-title>
+
+    </md-card>
 
 </md-content>
+
+<ng-include src="'views/modals.html'"></ng-include>

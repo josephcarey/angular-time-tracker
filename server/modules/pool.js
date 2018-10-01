@@ -36,7 +36,7 @@ if ( process.env.DATABASE_URL ) {
 const pool = new pg.Pool( config );
 
 // the pool will log when it connects to the database
-pool.on( 'connect', () => {
+pool.once( 'connect', () => {
     console.log( '### DB Connection successful on:' );
     console.log( config );
 } );

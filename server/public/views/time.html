@@ -1,75 +1,107 @@
-<h3>Time Entries</h3>
+<md-content layout="column">
 
-<table>
-    <thead>
-        <tr>
-            <th>Description</th>
-            <th>Date</th>
-            <th>Start Time</th>
-            <th>End Time</th>
-            <th>Total Time</th>
-            <th>Project</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr ng-repeat="time in vm.displayTimeEntries">
-            <td>{{time.description}}</td>
-            <td>{{time.date | date : "dd MMM yyyy"}}</td>
-            <td>{{time.start_time}}</td>
-            <td>{{time.end_time}}</td>
-            <td>{{time.total_time}}</td>
-            <td>{{time.project}}</td>
-            <td>
-                <button ng-click="vm.deleteTimeEntry(time)">Delete</button>
-            </td>
-        </tr>
-    </tbody>
-    <tfoot>
+    <md-card>
+        <md-card-title>
+            <md-card-title-text layout="column" layout-align="start start">
+                <span class="md-display-1">Time Entries</span>
+            </md-card-title-text>
+        </md-card-title>
 
-    </tfoot>
-</table>
+        <md-card-content>
 
-Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem dicta autem esse nulla pariatur obcaecati laborum et nisi
-quaerat odit praesentium quos, at quibusdam qui quia dignissimos exercitationem nemo. Tempore!
-Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem dicta autem esse nulla pariatur obcaecati laborum et nisi
-quaerat odit praesentium quos, at quibusdam qui quia dignissimos exercitationem nemo. Tempore!
-Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem dicta autem esse nulla pariatur obcaecati laborum et nisi
-quaerat odit praesentium quos, at quibusdam qui quia dignissimos exercitationem nemo. Tempore!
-Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem dicta autem esse nulla pariatur obcaecati laborum et nisi
-quaerat odit praesentium quos, at quibusdam qui quia dignissimos exercitationem nemo. Tempore!
-Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem dicta autem esse nulla pariatur obcaecati laborum et nisi
-quaerat odit praesentium quos, at quibusdam qui quia dignissimos exercitationem nemo. Tempore!
-Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem dicta autem esse nulla pariatur obcaecati laborum et nisi
-quaerat odit praesentium quos, at quibusdam qui quia dignissimos exercitationem nemo. Tempore!
-Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem dicta autem esse nulla pariatur obcaecati laborum et nisi
-quaerat odit praesentium quos, at quibusdam qui quia dignissimos exercitationem nemo. Tempore!
-Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem dicta autem esse nulla pariatur obcaecati laborum et nisi
-quaerat odit praesentium quos, at quibusdam qui quia dignissimos exercitationem nemo. Tempore!
+            <table class="my-table">
+                <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>start_date</th>
+                        <th>end_date</th>
+                        <th>project_id</th>
+                        <th>action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="timeEntry in vm.displayTimeEntries">
+                        <td>{{timeEntry.id}}</td>
+                        <td>
+                            <span class="md-caption">
+                                {{timeEntry.start_date | date : "shortTime"}}<br />
+                                {{timeEntry.start_date | date : "shortDate"}}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="md-caption">
+                                {{timeEntry.end_date | date : "shortTime"}}<br />
+                                {{timeEntry.end_date | date : "shortDate"}}
+                            </span>
+                        </td>
+                        <td>{{timeEntry.project}}</td>
+                        <td>
+                            <div layout="row">
+                                <md-button class="md-icon-button" ng-click="vm.stageEditTime(timeEntry)">
+                                    <i class="material-icons" style="font-size: 16px;">settings</i>
+                                </md-button>
+                                <md-button class="md-icon-button" ng-click="vm.deleteTime(timeEntry)">
+                                    <i class="material-icons" style="font-size: 16px;">delete</i>
+                                </md-button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
 
-<md-button class="md-fab md-primary md-fab-bottom-right" aria-label="Add" ng-click="vm.showForm()" style="position: fixed !important;">
-    Add
-    <!-- <ng-md-icon icon="add"></ng-md-icon> -->
-</md-button>
+                </tfoot>
+            </table>
 
-<!-- <pre>{{vm | json}}</pre> -->
+        </md-card-content>
 
-<div style="visibility: hidden" layout="column">
-    <div class="md-dialog-container" id="myStaticDialog">
-        <md-dialog>
-            <form ng-submit="vm.addTimeEntry(vm.newTimeEntry)">
-                <h3>Add Time Entry</h3>
-                <input type="text" ng-model="vm.newTimeEntry.description" placeholder="what did you do?" />
-                <select ng-model="vm.newTimeEntry.project_id" ng-options="project.id as project.name for project in vm.optionsProjects">
-                </select>
-                <input type="text" ng-model="vm.newTimeEntry.date" placeholder="date" />
-                <input type="text" ng-model="vm.newTimeEntry.startTime" placeholder="start time" />
-                <input type="text" ng-model="vm.newTimeEntry.endTime" placeholder="end time" />
-                <div layout="row">
-                    <button flex="50" class="md-button" ng-click="vm.closeMe()">Close</button>
-                    <input flex="50" class="md-button md-primary md-raised" type="submit" ng-click="vm.closeMe()" />
-                </div>
-            </form>
-        </md-dialog>
-    </div>
-</div>
+    </md-card>
+
+    <md-card>
+        <md-card-title>
+            <md-card-title-text layout="column" layout-align="start start">
+                <span class="md-display-1">Projects</span>
+            </md-card-title-text>
+        </md-card-title>
+
+        <md-card-content>
+
+            <table class="my-table">
+                <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>name</th>
+                        <th>description</th>
+                        <th>estimated_time</th>
+                        <th>parent_id</th>
+                        <th>action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="project in vm.displayProjects">
+                        <td>{{project.id}}</td>
+                        <td>{{project.name}}</td>
+                        <td>{{project.description}}</td>
+                        <td>{{project.estimated_time}}</td>
+                        <td>{{project.parent}}</td>
+                        <td>
+                            <md-button class="md-icon-button" ng-click="vm.stageEditProject(project)">
+                                <i class="material-icons" style="font-size: 16px;">settings</i>
+                            </md-button>
+                            <md-button class="md-icon-button" ng-click="vm.deleteProject(project)">
+                                <i class="material-icons" style="font-size: 16px;">delete</i>
+                            </md-button>
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+
+                </tfoot>
+            </table>
+
+        </md-card-content>
+
+    </md-card>
+
+</md-content>
+
+<ng-include src="'views/modals.html'"></ng-include>
