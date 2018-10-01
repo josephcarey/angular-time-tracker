@@ -1,58 +1,236 @@
 timeTrackerApp.controller( 'ProjectController', ['$http', '$mdToast', '$mdDialog', function ( $http, $mdToast, $mdDialog ) {
 
     // controller setup
-    console.log( 'ProjectController loaded!' );
     const self = this;
 
     // variables and stuff
     self.displayProjects = [];
+    self.projectToAdd = {};
+    self.projectToEdit = {};
+    self.timeToEdit = {};
+    self.timeToDelete = {};
+    self.currentSending = false;
+
+    // navigation stuff
+    self.currentProject = 0;
+    self.parentProject = 0;
 
 
     // --------------------
-    // CRUD Stuff
+    // Time CRUD
     // --------------------
 
-    // Create
+    self.addTime = function ( projectID ) {
+
+        // crude gate for making sure we don't submit two sometimes when we click
+        if ( !self.currentlySending ) {
+
+            self.currentlySending = true;
+
+            // send the project_id for initing the time entry in this project
+            $http.post( '/time', { project_id: projectID } )
+                .then( function () {
+                    self.navigateToProject( self.currentProject );
+                    self.currentlySending = false;
+                } )
+                .catch( function ( error ) {
+                    $mdToast.show( $mdToast.simple().textContent( 'There was a problem adding a new time to this project.' ) );
+                    console.log( '--- Error in addTime:' );
+                    console.log( error );
+                } )
+
+        }
+    }
+
+    self.stopTime = function ( timeEntryID ) {
+
+        // updates to the stop whack just do a NOW() in SQL to the end_time
+        $http.put( `/time/stop/${timeEntryID}`, {} )
+            .then( function () {
+                self.navigateToProject( self.currentProject );
+            } )
+            .catch( function ( error ) {
+                $mdToast.show( $mdToast.simple().textContent( 'There was a problem stopping the time.' ) );
+                console.log( '--- Error in stopTime:' );
+                console.log( error );
+            } )
+
+    }
+
+    // prep to be edited in the modal
+    self.stageEditTime = function ( timeToPutInEdit ) {
+
+        self.timeToEdit = timeToPutInEdit;
+
+        $mdDialog.show( {
+            contentElement: '#editTimeDialog',
+            parent: angular.element( document.body ),
+            clickOutsideToClose: true,
+            bindToController: true
+        } )
+
+
+    }
+
+    // do the actual edit
+    self.editTime = function ( timeToEdit ) {
+
+        $http.put( `/time/${timeToEdit.id}`, timeToEdit )
+            .then( function () {
+                self.navigateToProject( self.currentProject );
+            } )
+            .catch( function ( error ) {
+                $mdToast.show( $mdToast.simple().textContent( 'There was a problem editing the time.' ) );
+                console.log( '--- Error in editTime:' );
+                console.log( error );
+            } )
+
+    }
+
+    // delete
+    self.deleteTime = function ( thingToDelete ) {
+
+        console.log( '--- in deleteTime:' );
+        console.log( thingToDelete );
+
+        // set up the delete message
+        let confirm = $mdDialog.confirm()
+            .title( 'Confirm Delete' )
+            .textContent( `Are you sure you want to delete this time entry?` )
+            .ok( 'Delete' )
+            .cancel( 'Cancel' );
+
+        // ask if they're sure
+        $mdDialog.show( confirm )
+
+            .then( function () {
+
+                $http.delete( `/time/${thingToDelete.id}` )
+                    .then( function () {
+                        $mdToast.show( $mdToast.simple().textContent( 'Time Entry successfully deleted!' ) );
+                        self.navigateToProject( self.currentProject );
+                    } )
+                    .catch( function ( error ) {
+                        $mdToast.show( $mdToast.simple().textContent( 'There was a problem deleting the Time Entry.' ) );
+                        console.log( '--- Error in deleteTimeEntry:' );
+                        console.log( error );
+                    } )
+
+            } )
+
+            .catch( function ( error ) {
+                $mdToast.show( $mdToast.simple().textContent( 'Delete canceled.' ) );
+            } )
+
+    }
+
+
+    // --------------------
+    // Project CRUD
+    // --------------------
+
+    self.stageAddProject = function ( idIn ) {
+
+        console.log( 'in stageAddProject' );
+
+        if ( idIn != undefined ) {
+            self.projectToAdd.parent_id = idIn;
+        }
+
+        $mdDialog.show( {
+            contentElement: '#addProjectDialog',
+            parent: angular.element( document.body ),
+            clickOutsideToClose: true,
+            bindToController: true
+        } )
+    }
+
     self.addProject = function ( thingToAdd ) {
-
-        console.log( '--- in addProject:' );
-        console.log( thingToAdd );
+        console.log( 'in addProject' );
 
         $http.post( '/project', thingToAdd )
             .then( function () {
-                $mdToast.show( $mdToast.simple().textContent( 'New project created!' ) );
-                self.getProject();
+                self.navigateToProject( self.currentProject );
             } )
             .catch( function ( error ) {
-                $mdToast.show( $mdToast.simple().textContent( 'There was a problem adding a project.' ) );
+                $mdToast.show( $mdToast.simple().textContent( 'There was a problem adding a new project.' ) );
                 console.log( '--- Error in addProject:' );
                 console.log( error );
             } )
 
     }
 
-    // Read
-    self.getProject = function () {
+    self.navigateToProject = function ( destinationProject ) {
 
-        console.log( '--- in getProject.' );
+        console.log( 'destination project:', destinationProject );
+        console.log( 'current project:', self.currentProject )
 
-        $http.get( '/project' )
-            .then( function ( results ) {
-                console.log( '--- back from the server with:' );
-                console.log( results );
-                self.displayProjects = results.data;
+
+        if ( destinationProject == 0 ) {
+
+            $http.get( `/project/special/` )
+
+                .then( function ( results ) {
+                    self.displayProjects = results.data;
+                    console.log( self.displayProjects );
+
+                    self.currentProject = destinationProject;
+                    self.parentProject = 0;
+                } )
+                .catch( function ( error ) {
+                    $mdToast.show( $mdToast.simple().textContent( 'There was a problem getting the projects.' ) );
+                    console.log( '--- Error in getProjects:' );
+                    console.log( error );
+                } )
+
+        } else {
+
+            $http.get( `/project/special/${destinationProject}` )
+
+                .then( function ( results ) {
+                    self.displayProjects = results.data;
+                    self.currentProject = destinationProject;
+                    self.parentProject = self.displayProjects[0].parent_id || 0;
+                } )
+                .catch( function ( error ) {
+                    $mdToast.show( $mdToast.simple().textContent( 'There was a problem getting the projects.' ) );
+                    console.log( '--- Error in getProjects:' );
+                    console.log( error );
+                    self.navigateToProject( 0 );
+                } )
+
+        }
+    }
+
+
+    self.stageEditProject = function ( projectToPutInEdit ) {
+
+        self.projectToEdit = projectToPutInEdit;
+
+        $mdDialog.show( {
+            contentElement: '#editProjectDialog',
+            parent: angular.element( document.body ),
+            clickOutsideToClose: true,
+            bindToController: true
+        } )
+
+
+    }
+
+    self.editProject = function ( projectToEdit ) {
+
+        $http.put( `/project/${projectToEdit.id}`, projectToEdit )
+            .then( function () {
+                self.navigateToProject( self.currentProject );
             } )
             .catch( function ( error ) {
-                $mdToast.show( $mdToast.simple().textContent( 'There was a problem getting the projects.' ) );
-                console.log( '--- Error in getProjects:' );
+                $mdToast.show( $mdToast.simple().textContent( 'There was a problem editing the project.' ) );
+                console.log( '--- Error in editProject:' );
                 console.log( error );
             } )
 
     }
 
-    // Update
-
-    // Delete
     self.deleteProject = function ( thingToDelete ) {
 
         console.log( '--- in deleteProject:' );
@@ -62,85 +240,40 @@ timeTrackerApp.controller( 'ProjectController', ['$http', '$mdToast', '$mdDialog
             .title( 'Confirm Delete' )
             .textContent( `Are you sure you want to delete this project?` )
             .ok( 'Delete' )
-            .cancel( 'Cancel' )
+            .cancel( 'Cancel' );
 
         // ask if they're sure
         $mdDialog.show( confirm )
+
             .then( function () {
 
-                if ( thingToDelete.number_of_entries < 1 ) {
+                $http.delete( `/project/${thingToDelete.id}` )
+                    .then( function () {
+                        $mdToast.show( $mdToast.simple().textContent( 'Project successfully deleted!' ) );
+                        self.navigateToProject( self.currentProject );
+                    } )
+                    .catch( function ( error ) {
+                        $mdToast.show( $mdToast.simple().textContent( 'There was a problem deleting the Project.' ) );
+                        console.log( '--- Error in deleteProject:' );
+                        console.log( error );
+                    } )
 
-                    $http.delete( `/project/${thingToDelete.id}` )
-                        .then( function () {
-                            $mdToast.show( $mdToast.simple().textContent( 'Project successfully deleted!' ) );
-                            self.getProject();
-                        } )
-                        .catch( function ( error ) {
-                            $mdToast.show( $mdToast.simple().textContent( 'There was a problem deleting the project.' ) );
-                            console.log( '--- Error in deleteProject:' );
-                            console.log( error );
-                        } )
-                }
-                else {
-
-                    // Don't allow project to be deleted when it has time_entries
-                    // other behaviors could be delete all the things or orphan them.
-                    $mdDialog.show(
-                        $mdDialog.alert()
-                            .clickOutsideToClose( true )
-                            .title( 'Oops!' )
-                            .textContent( `You can't delete a project while it has times that belong to it.` )
-                            .ok( 'Okay' )
-                    )
-                }
             } )
+
             .catch( function ( error ) {
                 $mdToast.show( $mdToast.simple().textContent( 'Delete canceled.' ) );
             } )
+    }
 
-        //     let confirm = $mdDialog.confirm()
-        //     .title( 'Confirm Delete' )
-        //     .textContent( `Are you sure you want to destroy this ship?` )
-        //     .ok( 'Open fire!' )
-        //     .cancel( 'Let them live. For now.' );
+    // --------------------
+    // Other
+    // --------------------
 
-        // // ask if they're sure
-        // $mdDialog.show( confirm )
-        //     .then( function ( e ) {
-        //         console.log( 'in .then! e:', e );
-
-
-        //         if ( ship.current_crew > 0 ) {
-        //             $mdDialog.show(
-        //                 $mdDialog.alert()
-        //                     .clickOutsideToClose( true )
-        //                     .title( 'Warning!' )
-        //                     .textContent( `You can't delete a ship while it still has crew!` )
-        //                     .ok( 'Aye-aye cap\'n!' )
-        //             )
-
-        //         } else {
-        //             // Delete an existing ship, must have no crew!
-        //             $http( {
-        //                 method: 'DELETE',
-        //                 url: `/ships/${ship.id}`
-        //             } ).then( ( response ) => {
-        //                 self.getShips();
-        //                 $mdToast.show( $mdToast.simple().textContent( 'Ship successfully destroyed. They\'re nothing but flotsam now.' ) );
-        //             } ).catch( ( error ) => {
-        //                 console.log( 'error making rent get request', error );
-        //                 $mdToast.show( $mdToast.simple().textContent( 'Something went wrong! Check the server.' ) );
-        //             } );
-        //         }
-        //     } )
-        //     .catch( function ( e ) {
-        //         console.log( 'in .catch! e:', e );
-        //     } )
-
-
+    self.closeMe = function () {
+        $mdDialog.hide();
     }
 
     // initial calls
-    self.getProject();
+    self.navigateToProject( 0 );
 
 }] )

@@ -66,58 +66,14 @@ router.get( '/', ( req, res ) => {
         `
     )
         .then( ( results ) => {
-
             console.log( '### Back from DB with:' );
             console.log( results.rows );
-
-            let resultsToSend = results.rows;
-            // for ( result of resultsToSend ) {
-
-            //     console.log( result )
-            //     result.totalTime = '';
-
-            //     // use the number of results in a thing to determine whether it is empty
-            //     // time entries must be non-null and non-negative? (we should enforce this)
-            //     // and so if it has one entry, it has at least one time
-
-            //     if ( result.number_of_entries === 0 ) {
-            //         results.total_time = { hours: 0, minutes: 0 }
-            //     }
-
-            //     // fix this by checking for 
-
-            //     // concat the hours
-            //     if ( result.total_time.hasOwnProperty( hours ) ) {
-            //         result.totalTime += result.total_time.hours;
-            //     } else {
-            //         result.totalTime += '0';
-            //     }
-
-            //     result.totalTime += ':';
-
-            //     // concat the minutes
-            //     if ( result.total_time.hasOwnProperty( minutes ) ) {
-            //         if ( result.total_time.minutes < 10 ) {
-            //             result.totalTime += '0'
-            //         }
-            //         result.totalTime += result.total_time.minutes;
-            //     } else {
-            //         result.totalTime += '00';
-            //     }
-
-            //     delete result.total_time;
-
-            // }
-
             res.send( resultsToSend );
-
         } )
         .catch( ( error ) => {
-
             console.log( '### Error with SQL SELECT:' );
             console.log( error );
             res.sendStatus( 500 );
-
         } );
 
 } );
@@ -185,6 +141,174 @@ router.delete( '/:id', ( req, res ) => {
 // --------------------
 // --------------------
 // --------------------
+
+
+
+
+router.get( '/special/:id', ( req, res ) => {
+
+    console.log( '###', routerName, '/all router /GET call.' );
+
+    pool.query(
+        `
+        SELECT
+	"parent".*,
+	COALESCE(json_agg(DISTINCT "time_entry") FILTER (WHERE "time_entry"."id" IS NOT NULL), '[]') AS "time_entries",
+	COALESCE(json_agg(DISTINCT "child") FILTER (WHERE "child"."id" IS NOT NULL), '[]') AS "children"
+	FROM "project" "parent"
+	LEFT OUTER JOIN "project" "child" ON "parent"."id" = "child"."parent_id"
+    LEFT OUTER JOIN "time_entry" ON "parent"."id" = "time_entry"."project_id"
+    WHERE "parent"."id" = $1
+	GROUP BY "parent"."id";
+        `,
+        [
+            /* $1 */ req.params.id
+        ]
+    )
+        .then( ( results ) => {
+
+            console.log( '### Back from DB with:' );
+            console.log( results.rows );
+            res.send( results.rows );
+
+        } )
+        .catch( ( error ) => {
+
+            console.log( '### Error with SQL SELECT:' );
+            console.log( error );
+            res.sendStatus( 500 );
+
+        } );
+
+} );
+
+router.get( '/special', ( req, res ) => {
+
+    if ( req.params.id === null ) {
+        console.log( '### this filters nulls correctly!' );
+    } else {
+        console.log( '### req.params.id:', req.params.id );
+
+    }
+
+    console.log( '###', routerName, '/all router /GET call.' );
+
+    pool.query(
+        `
+        SELECT
+	"parent".*,
+	COALESCE(json_agg(DISTINCT "time_entry") FILTER (WHERE "time_entry"."id" IS NOT NULL), '[]') AS "time_entries",
+	COALESCE(json_agg(DISTINCT "child") FILTER (WHERE "child"."id" IS NOT NULL), '[]') AS "children"
+	FROM "project" "parent"
+	LEFT OUTER JOIN "project" "child" ON "parent"."id" = "child"."parent_id"
+    LEFT OUTER JOIN "time_entry" ON "parent"."id" = "time_entry"."project_id"
+    WHERE "parent"."parent_id" IS NULL
+	GROUP BY "parent"."id";
+        `
+    )
+        .then( ( results ) => {
+
+            console.log( '### Back from DB with:' );
+            console.log( results.rows );
+            res.send( results.rows );
+
+        } )
+        .catch( ( error ) => {
+
+            console.log( '### Error with SQL SELECT:' );
+            console.log( error );
+            res.sendStatus( 500 );
+
+        } );
+
+} );
+
+
+
+
+
+
+
+module.exports = router;
+
+
+
+// ---------------------------------------------------
+// Broken code . . .
+// ---------------------------------------------------
+
+function getTotalTime( startingID ) {
+
+
+    return new Promise( function ( resolve, reject ) {
+
+        numberOfSecondsTotal = 0;
+
+        idsToProcess = [];
+        idsToProcess.push( startingID );
+
+        while ( idsToProcess.length > 0 ) {
+
+            console.log( idsToProcess );
+
+
+
+            // add the children projects to the list of ids
+            let addChildren = new Promise( function ( resolve, reject ) {
+
+                pool.query(
+                    `
+            SELECT "child"."id"
+	        FROM "project" "child"
+	        LEFT OUTER JOIN "project" "parent" ON "child"."parent_id" = "parent"."id"
+	        WHERE "parent"."id" = $1;
+        `, [idsToProcess[0]]
+                )
+                    .then( ( results ) => {
+                        for ( row of results.rows ) {
+                            idsToProcess.push( row );
+                            resolve();
+                        }
+                    } )
+
+            } )
+            // add the hours of the time entries
+            let addHours = new Promise( function ( resolve, reject ) {
+                pool.query(
+                    `
+            SELECT
+	            SUM(
+	                EXTRACT (epoch FROM (
+                        "time_entry"."end_date" - "time_entry"."start_date"
+                    ))
+                ) AS "total_time"
+            FROM "time_entry"
+            WHERE "project_id" = $1;
+            `,
+                    [idsToProcess[0]]
+                ).then( ( results ) => {
+                    for ( row of results.rows ) {
+                        console.log( 'row:', row );
+                        numberOfSecondsTotal += Number( row.total_time )
+                        console.log( 'numberOfHours:', numberOfSecondsTotal );
+                        resolve();
+                    }
+                } )
+
+            } )
+
+            Promise.all( [addChildren, addHours] )
+                .then( () => {
+                    idsToProcess.shift();
+                } )
+
+        }
+
+        console.log( numberOfSecondsTotal );
+
+        resolve( numberOfSecondsTotal );
+    } )
+}
 
 router.get( '/overview/', ( req, res ) => {
 
@@ -276,241 +400,4 @@ router.get( '/overview/', ( req, res ) => {
             console.log( '### something went wrong' );
         } )
 
-
-
-
 } )
-
-router.get( '/overview/:id', ( req, res ) => {
-
-    console.log( '###', routerName, '/overview router /GET call.' );
-
-    thingToSend = [];
-
-    // first get the root projects
-    pool.query(
-        `
-        SELECT *
-        FROM "project"
-        WHERE "parent_id" = $1;
-        `,
-        [req.params.id]
-    )
-        .then( ( results ) => {
-            thingToSend = results.rows;
-
-            // cycle through...
-            for ( thing of thingToSend ) {
-
-                // get total hours
-                // getTotalTime( thing.id )
-                // .then( ( response ) => 
-
-
-                // get their sub-projects
-                pool.query(
-                    `
-                SELECT *
-                FROM "project"
-                WHERE "parent_id" = $1
-                `,
-                    [
-                    /* $1 */ thing.id
-                    ]
-                )
-                    .then( ( results ) => {
-                        thingToSend.children = results.rows;
-                    } )
-                    .catch( ( error ) => {
-                        console.log( '### something went wrong' );
-                    } )
-
-
-                // and their time entries
-                pool.query(
-                    `
-                SELECT *
-                FROM "time_entry"
-                WHERE "project_id" = $1
-                `,
-                    [
-                    /* $1 */ thing.id
-                    ]
-                )
-                    .then( ( results ) => {
-                        thingToSend.time_entries = results.rows;
-                    } )
-                    .catch( ( error ) => {
-                        console.log( '### something went wrong' );
-                    } )
-
-            }
-
-            res.send( thingToSend );
-
-        } )
-        .catch( ( error ) => {
-            console.log( '### something went wrong' );
-        } )
-
-
-
-
-} )
-
-router.get( '/special/:id', ( req, res ) => {
-
-    console.log( '###', routerName, '/all router /GET call.' );
-
-    pool.query(
-        `
-        SELECT
-	"parent".*,
-	COALESCE(json_agg(DISTINCT "time_entry") FILTER (WHERE "time_entry"."id" IS NOT NULL), '[]') AS "time_entries",
-	COALESCE(json_agg(DISTINCT "child") FILTER (WHERE "child"."id" IS NOT NULL), '[]') AS "children"
-	FROM "project" "parent"
-	LEFT OUTER JOIN "project" "child" ON "parent"."id" = "child"."parent_id"
-    LEFT OUTER JOIN "time_entry" ON "parent"."id" = "time_entry"."project_id"
-    WHERE "parent"."id" = $1
-	GROUP BY "parent"."id";
-        `,
-        [
-            /* $1 */ req.params.id
-        ]
-    )
-        .then( ( results ) => {
-
-            console.log( '### Back from DB with:' );
-            console.log( results.rows );
-            res.send( results.rows );
-
-        } )
-        .catch( ( error ) => {
-
-            console.log( '### Error with SQL SELECT:' );
-            console.log( error );
-            res.sendStatus( 500 );
-
-        } );
-
-} );
-
-router.get( '/special', ( req, res ) => {
-
-    if ( req.params.id === null ) {
-        console.log( '### this filters nulls correctly!' );
-    } else {
-        console.log( '### req.params.id:', req.params.id );
-
-    }
-
-    console.log( '###', routerName, '/all router /GET call.' );
-
-    pool.query(
-        `
-        SELECT
-	"parent".*,
-	COALESCE(json_agg(DISTINCT "time_entry") FILTER (WHERE "time_entry"."id" IS NOT NULL), '[]') AS "time_entries",
-	COALESCE(json_agg(DISTINCT "child") FILTER (WHERE "child"."id" IS NOT NULL), '[]') AS "children"
-	FROM "project" "parent"
-	LEFT OUTER JOIN "project" "child" ON "parent"."id" = "child"."parent_id"
-    LEFT OUTER JOIN "time_entry" ON "parent"."id" = "time_entry"."project_id"
-    WHERE "parent"."parent_id" IS NULL
-	GROUP BY "parent"."id";
-        `
-    )
-        .then( ( results ) => {
-
-            console.log( '### Back from DB with:' );
-            console.log( results.rows );
-            res.send( results.rows );
-
-        } )
-        .catch( ( error ) => {
-
-            console.log( '### Error with SQL SELECT:' );
-            console.log( error );
-            res.sendStatus( 500 );
-
-        } );
-
-} );
-
-
-
-function getTotalTime( startingID ) {
-
-
-    return new Promise( function ( resolve, reject ) {
-
-        numberOfSecondsTotal = 0;
-
-        idsToProcess = [];
-        idsToProcess.push( startingID );
-
-        while ( idsToProcess.length > 0 ) {
-
-            console.log( idsToProcess );
-
-
-
-            // add the children projects to the list of ids
-            let addChildren = new Promise( function ( resolve, reject ) {
-
-                pool.query(
-                    `
-            SELECT "child"."id"
-	        FROM "project" "child"
-	        LEFT OUTER JOIN "project" "parent" ON "child"."parent_id" = "parent"."id"
-	        WHERE "parent"."id" = $1;
-        `, [idsToProcess[0]]
-                )
-                    .then( ( results ) => {
-                        for ( row of results.rows ) {
-                            idsToProcess.push( row );
-                            resolve();
-                        }
-                    } )
-
-            } )
-            // add the hours of the time entries
-            let addHours = new Promise( function ( resolve, reject ) {
-                pool.query(
-                    `
-            SELECT
-	            SUM(
-	                EXTRACT (epoch FROM (
-                        "time_entry"."end_date" - "time_entry"."start_date"
-                    ))
-                ) AS "total_time"
-            FROM "time_entry"
-            WHERE "project_id" = $1;
-            `,
-                    [idsToProcess[0]]
-                ).then( ( results ) => {
-                    for ( row of results.rows ) {
-                        console.log( 'row:', row );
-                        numberOfSecondsTotal += Number( row.total_time )
-                        console.log( 'numberOfHours:', numberOfSecondsTotal );
-                        resolve();
-                    }
-                } )
-
-            } )
-
-            Promise.all( [addChildren, addHours] )
-                .then( () => {
-                    idsToProcess.shift();
-                } )
-
-        }
-
-        console.log( numberOfSecondsTotal );
-
-        resolve( numberOfSecondsTotal );
-    } )
-}
-
-
-
-module.exports = router;
